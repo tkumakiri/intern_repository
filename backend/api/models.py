@@ -25,6 +25,7 @@ class Follow(models.Model):
     user = models.ForeignKey(
         User,
         verbose_name='フォロー元',
+        related_name='follow_user',
         on_delete=models.CASCADE
 
     )
@@ -32,6 +33,7 @@ class Follow(models.Model):
     follow = models.ForeignKey(
         User,
         verbose_name='フォロー先',
+        related_name='follow_follow',
         on_delete=models.CASCADE
 
     )
@@ -48,6 +50,7 @@ class Dm(models.Model):
     sender = models.ForeignKey(
         User,
         verbose_name='書いたユーザー',
+        related_name='Dm_sender',
         on_delete=models.CASCADE
     )
 
@@ -61,6 +64,7 @@ class Dm(models.Model):
     receiver = models.ForeignKey(
         User,
         verbose_name='送信先ユーザー',
+        related_name='Dm_receiver',
         on_delete=models.CASCADE
     )
 
@@ -81,12 +85,14 @@ class Live_stream(models.Model):
 
     live_url = models.CharField(
         verbose_name='ライブ視聴URL',
+        max_length=2000,
         blank=False,
         null=True
     )
 
     ticket_url = models.CharField(
         verbose_name='ライブチケット購入URL',
+        max_length=2000,
         blank=False,
         null=True
     )
@@ -98,8 +104,9 @@ class Ticket(models.Model):
         on_delete=models.CASCADE
     )
 
-    ticket_number = models.charField(
+    ticket_number = models.CharField(
         verbose_name='チケット番号',
+        max_length=200,
         blank=False,
         null=False
     )
@@ -146,12 +153,10 @@ class Post(models.Model):
     reply_target = models.ForeignKey(
         "self",
         verbose_name='リプライ先投稿',
-        # on_delete=models.CASCADE
+        on_delete=models.CASCADE
     )
 
-
 class Live_picture(models.Model):
-
     post = models.ForeignKey(
         Post,
         verbose_name='投稿',
@@ -159,14 +164,14 @@ class Live_picture(models.Model):
     )
 
     image_name = models.CharField(
-        verbose_name='投稿名',
+        verbose_name='画像名',
+        max_length=200,
         blank=False,
         null=False
     )
 
-    data = models.CharField(
+    data = models.BinaryField(
         verbose_name='画像データ',
-        blank=False,
         null=False
     )
 
