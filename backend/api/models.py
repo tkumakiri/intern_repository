@@ -170,7 +170,7 @@ class Live_picture(models.Model):
         null=False
     )
 
-    data = models.BinaryField(
+    data = models.TextField(
         verbose_name='画像データ',
         null=False
     )
