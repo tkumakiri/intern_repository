@@ -26,28 +26,31 @@
         </v-form>
       </v-card-text>
     </v-card>
+    <router-link to="/livedetail">Go to SNS</router-link>
   </v-app>
 </template>
 
 <script>
-
 export default {
-  name: 'App',
+  name: "App",
   data() {
-    return{
+    return {
       showPassword: false,
-      email: '',
-      password: '',
+      email: "",
+      password: "",
       rules: [
-        v => !!v || '',
-        v => /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]{1,}\.[A-Za-z0-9]{1,}$/.test(v) || '正しいメールアドレスを入力してください'
-      ]
-    }
+        (v) => !!v || "",
+        (v) =>
+          /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]{1,}\.[A-Za-z0-9]{1,}$/.test(
+            v
+          ) || "正しいメールアドレスを入力してください",
+      ],
+    };
   },
   methods: {
-    submit(){
+    submit() {
       //console.log(this.email, this.password);
-    }
+    },
   },
 };
 </script>
