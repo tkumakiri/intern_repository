@@ -23,16 +23,6 @@
             :counter="min"
           />
           <v-text-field
-            v-bind:type="showPassword ? 'text' : 'password'"
-            @click:append="showPassword = !showPassword"
-            prepend-icon="mdi-lock-outline"
-            v-bind:append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-            label="パスワード(確認用)"
-            v-model="password2"
-            :rules="rules_password"
-            :counter="min"
-          />
-          <v-text-field
             prepend-icon="mdi-account-circle-outline"
             label="表示名"
             v-model="username"
