@@ -53,7 +53,6 @@
     </v-card>
   </v-app>
 </template>
-
 <script>
 
 export default {
