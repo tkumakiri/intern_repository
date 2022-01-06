@@ -15,17 +15,21 @@
 
 <script>
 // import HelloWorld from "./components/HelloWorld";
-// import LiveDetail from "./components/LiveDetail";
-// import Myprofile from "./components/Myprofile";
+import LiveDetail from "./components/LiveDetail";
+import login from './components/login'
+import register from './components/register';
+import home from './components/home'
 
 export default {
   name: "App",
 
   components: {
     // HelloWorld,
-    // LiveDetail,
-    // Myprofile,
-  },
+    LiveDetail,
+    login,
+    register,
+    home
+  },  
 
   data: () => ({
     //
