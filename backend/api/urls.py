@@ -3,14 +3,13 @@ from django.urls import path
 from rest_framework import routers
 
 from api import views_directmessages
-from .views import AuthRegister, AuthInfoGetView, AuthInfoUpdateView, UserRetrieve
-from . import views_lives, views_posts, views_follow, views_goods
+from . import views_auth, views_lives, views_posts, views_follow, views_goods
 
 urlpatterns = [
-    path('users/', AuthRegister.as_view()),
-    path('auth/me/', AuthInfoGetView.as_view()),
-    path('auth/auth_update/', AuthInfoUpdateView.as_view()),
-    path('users/<int:pk>/', UserRetrieve.as_view()),
+    path('users/', views_auth.AuthRegister.as_view()),
+    path('auth/me/', views_auth.AuthInfoGetView.as_view()),
+    path('auth/auth_update/', views_auth.AuthInfoUpdateView.as_view()),
+    path('users/<int:pk>/', views_auth.UserRetrieve.as_view()),
     path('lives', views_lives.LivesView.as_view()),
     path('lives/<int:pk>', views_lives.LiveView.as_view()),
     path('live_registrations', views_lives.LiveRegistrationView.as_view()),
