@@ -1,12 +1,12 @@
 <template>
-  <v-app class="livedetail">
+  <v-app class="blue-grey lighten-5">
     <v-list>
       <v-list-item>
         <v-list-item-title class="text-h6">
           00月00日開催 ライブ
         </v-list-item-title>
         <v-list-item-icon>
-          <v-btn fab dark color="indigo">
+          <v-btn fab dark color="indigo" @click="onClickTweet">
             <v-icon dark> mdi-plus </v-icon>
           </v-btn>
         </v-list-item-icon>
@@ -16,7 +16,7 @@
     <v-card class="mb-2">
       <v-list>
         <v-list-item>
-          <v-list-item-avatar @click="onClick">
+          <v-list-item-avatar @click="onClickUser">
             <v-img src="../assets/testuser.png" max-width="100" />
           </v-list-item-avatar>
           <v-list-item-content>
@@ -59,8 +59,11 @@
 export default {
   name: "LiveDetail",
   methods: {
-    onClick: function () {
-      this.$router.push("/myprofile");
+    onClickUser: function () {
+      this.$router.push("/userprofile");
+    },
+    onClickTweet: function () {
+      this.$router.push("/tweet");
     },
   },
 };

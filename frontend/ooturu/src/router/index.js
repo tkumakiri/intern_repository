@@ -3,7 +3,9 @@ import Router from "vue-router";
 
 import LiveDetail from "../components/LiveDetail.vue";
 import Myprofile from "../components/Myprofile.vue";
+import Userprofile from "../components/Userprofile.vue";
 import Login from "../components/login.vue";
+import Tweet from "../components/Tweet.vue";
 
 Vue.use(Router);
 
@@ -24,6 +26,16 @@ export default new Router({
       path: "/myprofile",
       name: "myprofile",
       component: Myprofile,
+    },
+    {
+      path: "/userprofile",
+      name: "userprofile",
+      component: Userprofile,
+    },
+    {
+      path: "/tweet",
+      name: "tweet",
+      component: Tweet,
     },
   ],
 });
