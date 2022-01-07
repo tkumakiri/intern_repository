@@ -675,6 +675,8 @@ paths:
     delete:
       tags:
         - follows
+      security:
+        - bearer: []
       summary: フォローを解除する。
       parameters:
         - name: follow_id
@@ -845,6 +847,8 @@ paths:
     delete:
       tags:
         - goods
+      security:
+        - bearer: []
       summary: いいねを解除する。
       parameters:
         - name: good_id
