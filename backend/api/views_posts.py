@@ -1,13 +1,27 @@
+from functools import reduce
+
 from django.db.models.query import Prefetch
+from django.db.models.query_utils import Q
 from rest_framework.fields import CharField
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework.views import APIView
 
 from api import errors, views_lives
-from api.models import Live_picture, Live_stream, Post, User
+from api.models import (
+    Follow,
+    Live_picture,
+    Live_register,
+    Live_stream,
+    Post,
+    User,
+)
 
 BASIC_QUERYSET_POST = Post.objects.all().prefetch_related("live_picture_set")
 
@@ -69,14 +83,35 @@ def resolve(validated_data, id_field, entity_field):
 
 # 投稿を一覧 / 検索する
 class PostsView(APIView):
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        queryset = BASIC_QUERYSET_POST.all().prefetch_related(
-            Prefetch(
-                "live_picture_set",
-                Live_picture.objects.only("data").all(),
-                "screenshots",
+        # 条件「自分がフォローしているユーザーが書き込んでいる投稿」
+        following = [
+            follow.follow
+            for follow in Follow.objects.all().filter(user=request.user)
+        ]
+        is_following = Q(author__in=following)
+
+        # 条件「自分が参加登録をしたライブの投稿」
+        registering = [
+            registration.live
+            for registration in Live_register.objects.all().filter(
+                user=request.user
+            )
+        ]
+        is_registering = Q(live__in=registering)
+
+        queryset = (
+            BASIC_QUERYSET_POST.all()
+            .filter(is_following | is_registering)
+            .distinct()
+            .prefetch_related(
+                Prefetch(
+                    "live_picture_set",
+                    Live_picture.objects.only("data").all(),
+                    "screenshots",
+                )
             )
         )
         serializer = PostSerializer(queryset, many=True)
