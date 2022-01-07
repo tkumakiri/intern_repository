@@ -242,7 +242,7 @@ class Post(models.Model):
         null=False
     )
 
-    auther = models.ForeignKey(
+    author = models.ForeignKey(
         User,
         verbose_name='書いたユーザー',
         on_delete=models.CASCADE
