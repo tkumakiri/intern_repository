@@ -801,7 +801,7 @@ paths:
     get:
       tags:
         - goods
-      summary: フォローを一覧する。
+      summary: いいねを一覧する。
       description: サービス上に存在する全てのいいねを一覧する。user を指定するとそのユーザーからのいいねに絞り込む。post を指定するとそのユーザーへのいいねに絞り込む。
       parameters:
         - name: user
