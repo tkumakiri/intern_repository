@@ -29,6 +29,11 @@ class UserManager(BaseUserManager):
             profile=profile
         )
 
+        if request_data.get('image_name'):
+            if request_data.get('data'):
+                user.image_name = request_data['image_name']
+                user.data = request_data['data']
+
         user.set_password(request_data['password'])
         user.save(using=self._db)
 
@@ -70,6 +75,19 @@ class User(AbstractBaseUser):
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+
+    image_name = models.CharField(
+        verbose_name='画像名',
+        max_length=200,
+        blank=False,
+        null=True
+    )
+
+    data = models.TextField(
+        verbose_name='画像データ',
+        blank=False,
+        null=True
+    )
 
     objects = UserManager()
 
