@@ -1,6 +1,8 @@
 from django.conf.urls import include, url
 from django.urls import path
 from rest_framework import routers
+
+from api import views_directmessages
 from .views import AuthRegister, AuthInfoGetView, AuthInfoUpdateView, UserRetrieve
 from . import views_lives, views_posts, views_follow, views_goods
 
@@ -18,4 +20,6 @@ urlpatterns = [
     path('posts/<int:pk>', views_posts.PostView.as_view()),
     path('goods', views_goods.GoodsView.as_view()),
     path('goods/<int:pk>', views_goods.GoodView.as_view()),
+    path('directmessages', views_directmessages.DirectMessagesView.as_view()),
+    path('directmessages/<int:pk>', views_directmessages.DirectMessageView.as_view()),
 ]
