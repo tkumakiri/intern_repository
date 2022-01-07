@@ -19,6 +19,7 @@ import LiveDetail from "./components/LiveDetail";
 import login from './components/login'
 import register from './components/register';
 import home from './components/home'
+import liveResister from "./compornents/liveResister"
 
 export default {
   name: "App",
@@ -28,7 +29,8 @@ export default {
     LiveDetail,
     login,
     register,
-    home
+    home,
+    liveResister
   },  
 
   data: () => ({
