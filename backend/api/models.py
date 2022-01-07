@@ -242,7 +242,7 @@ class Post(models.Model):
         null=False
     )
 
-    auther = models.ForeignKey(
+    author = models.ForeignKey(
         User,
         verbose_name='書いたユーザー',
         on_delete=models.CASCADE
@@ -263,7 +263,9 @@ class Post(models.Model):
     reply_target = models.ForeignKey(
         "self",
         verbose_name='リプライ先投稿',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
     )
 
 class Live_picture(models.Model):
@@ -271,13 +273,6 @@ class Live_picture(models.Model):
         Post,
         verbose_name='投稿',
         on_delete=models.CASCADE
-    )
-
-    image_name = models.CharField(
-        verbose_name='画像名',
-        max_length=200,
-        blank=False,
-        null=False
     )
 
     data = models.TextField(
