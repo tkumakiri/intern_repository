@@ -1,24 +1,35 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark> </v-app-bar>
-
-    <!-- <v-main>
-      <HelloWorld />
-      <LiveDetail />
-      <Myprofile />
-    </v-main> -->
-    <v-content>
-      <router-view />
-    </v-content>
+    <component :is="headerComponent"></component>
+    <v-main>
+      <!-- <HelloWorld /> -->
+      <!-- <Search /> -->
+      <!-- <DmList /> -->
+      <!-- <LiveDetail /> -->
+      <!-- <Myprofile /> -->
+      <!-- <Home />
+      <Login />
+      <Register />
+      <LiveRegister /> -->
+      <v-content>
+        <router-view />
+      </v-content>
+    </v-main>
   </v-app>
 </template>
 
 <script>
 // import HelloWorld from "./components/HelloWorld";
-// import LiveDetail from "./components/LiveDetail";
-// import login from './components/login'
-// import register from './components/register';
-// import home from './components/home'
+//import LiveDetail from "./components/LiveDetail";
+// import login from "./components/Login";
+// import register from "./components/Register";
+// import home from "./components/Home";
+// import liveRegister from "./components/LiveRegister"
+// import dmList from "./components/DmList";
+// import search from "./components/Search";
+import LoggedInHeader from "./components/LoggedInHeader";
+import NotLoggedInHeader from "./components/NotLoggedInHeader";
+
 
 export default {
   name: "App",
@@ -26,10 +37,27 @@ export default {
   components: {
     // HelloWorld,
     // LiveDetail,
-    // login,
-    // register,
-    // home
-  },
+    // Login,
+    // Register,
+    // Home,
+    // LiveRegister,
+    // DmList,
+    // Search
+    LoggedInHeader,
+    NotLoggedInHeader
+},  
+computed: {
+  headerComponent() {
+    switch(this.$route.path) {
+      case '/register':
+        return 'NotLoggedInHeader';
+      case '/':
+        return 'NotLoggedInHeader';
+      default:
+        return 'LoggedInHeader';
+    }
+  }
+},
 
   data: () => ({
     //

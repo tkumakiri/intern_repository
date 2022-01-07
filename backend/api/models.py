@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import constraints
 from django.utils import timezone
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser, _user_has_perm
@@ -27,6 +28,11 @@ class UserManager(BaseUserManager):
             date_joined=now,
             profile=profile
         )
+
+        if request_data.get('image_name'):
+            if request_data.get('data'):
+                user.image_name = request_data['image_name']
+                user.data = request_data['data']
 
         user.set_password(request_data['password'])
         user.save(using=self._db)
@@ -70,6 +76,19 @@ class User(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
+    image_name = models.CharField(
+        verbose_name='画像名',
+        max_length=200,
+        blank=False,
+        null=True
+    )
+
+    data = models.TextField(
+        verbose_name='画像データ',
+        blank=False,
+        null=True
+    )
+
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
@@ -112,6 +131,14 @@ class Follow(models.Model):
         on_delete=models.CASCADE
 
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields = ["user", "follow"],
+                name = "unique_follow",
+            ),
+        ]
 
 
 class Dm(models.Model):
@@ -199,6 +226,14 @@ class Live_register(models.Model):
         on_delete=models.CASCADE
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields = ["user", "live"],
+                name = "unique_registration",
+            ),
+        ]
+
 class Post(models.Model):
     text = models.TextField(
         verbose_name='内容',
@@ -207,7 +242,7 @@ class Post(models.Model):
         null=False
     )
 
-    auther = models.ForeignKey(
+    author = models.ForeignKey(
         User,
         verbose_name='書いたユーザー',
         on_delete=models.CASCADE
@@ -228,7 +263,9 @@ class Post(models.Model):
     reply_target = models.ForeignKey(
         "self",
         verbose_name='リプライ先投稿',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
     )
 
 class Live_picture(models.Model):
@@ -236,13 +273,6 @@ class Live_picture(models.Model):
         Post,
         verbose_name='投稿',
         on_delete=models.CASCADE
-    )
-
-    image_name = models.CharField(
-        verbose_name='画像名',
-        max_length=200,
-        blank=False,
-        null=False
     )
 
     data = models.TextField(
@@ -263,7 +293,10 @@ class Good(models.Model):
         on_delete=models.CASCADE
     )
 
-
-
-
-
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields = ["post", "user"],
+                name = "unique_good",
+            ),
+        ]

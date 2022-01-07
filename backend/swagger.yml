@@ -41,7 +41,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                type: object
+                properties:
+                  token:
+                    type: string
         "401":
           description: |
             メールアドレスが登録されていないかパスワードが異なる。
@@ -76,6 +79,34 @@ paths:
             ログインしていない。
           content:
             "*/*":
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 1001
+                  error:
+                    type: string
+                    example: no active user
+  /auth/me:
+    get:
+      tags:
+        - auth
+      security:
+        - bearer: []
+      summary: 現在ログインしているユーザーの情報を得る。
+      responses:
+        "200":
+          description: 成功。
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: |
+            ログインしていない。
+          content:
+            application/json:
               schema:
                 type: object
                 properties:
@@ -159,34 +190,6 @@ paths:
                   error:
                     type: string
                     example: specified user not found
-  /me:
-    get:
-      tags:
-        - users
-      security:
-        - bearer: []
-      summary: 現在ログインしているユーザーの情報を得る。
-      responses:
-        "200":
-          description: 成功。
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "401":
-          description: |
-            ログインしていない。
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 1001
-                  error:
-                    type: string
-                    example: no active user
   /lives:
     get:
       tags:
@@ -246,7 +249,7 @@ paths:
                   error:
                     type: string
                     example: specified live not found
-  /lives/registration:
+  /live_registrations:
     post:
       tags:
         - lives
@@ -675,6 +678,8 @@ paths:
     delete:
       tags:
         - follows
+      security:
+        - bearer: []
       summary: フォローを解除する。
       parameters:
         - name: follow_id
@@ -799,7 +804,7 @@ paths:
     get:
       tags:
         - goods
-      summary: フォローを一覧する。
+      summary: いいねを一覧する。
       description: サービス上に存在する全てのいいねを一覧する。user を指定するとそのユーザーからのいいねに絞り込む。post を指定するとそのユーザーへのいいねに絞り込む。
       parameters:
         - name: user
@@ -845,6 +850,8 @@ paths:
     delete:
       tags:
         - goods
+      security:
+        - bearer: []
       summary: いいねを解除する。
       parameters:
         - name: good_id

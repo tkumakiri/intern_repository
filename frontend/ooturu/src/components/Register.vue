@@ -36,7 +36,7 @@
             :rules="rules_profile"
           />
           <v-card-actions class="justify-center">
-            <v-btn class="primary" @click="submit">登録</v-btn>
+            <v-btn class="primary" to="/home" @click="submit">登録</v-btn>
           </v-card-actions>
         </v-form>
       </v-card-text>
@@ -54,7 +54,6 @@ export default {
       showPassword: false,
       email: '',
       password: '',
-      password2: '',
       username: '',
       profile: '',
       rules_email: [
