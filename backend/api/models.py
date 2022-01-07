@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import constraints
 from django.utils import timezone
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser, _user_has_perm
@@ -112,6 +113,14 @@ class Follow(models.Model):
         on_delete=models.CASCADE
 
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields = ["user", "follow"],
+                name = "unique_follow",
+            ),
+        ]
 
 
 class Dm(models.Model):
