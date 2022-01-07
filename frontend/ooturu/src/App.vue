@@ -4,12 +4,13 @@
 
     <v-main>
       <!-- <HelloWorld /> -->
-      <!-- <LiveDetail /> -->
+      <dmList />
+      <LiveDetail />
       <!-- <Myprofile /> -->
-      <!-- <home />
+      <home />
       <login />
       <register />
-      <liveRegister /> -->
+      <liveRegister />
       <v-content>
         <router-view />
       </v-content>
@@ -20,10 +21,11 @@
 <script>
 // import HelloWorld from "./components/HelloWorld";
 import LiveDetail from "./components/LiveDetail";
-import login from './components/login'
-import register from './components/register';
-import home from './components/home'
+import login from "./components/login";
+import register from "./components/register";
+import home from "./components/home";
 import liveRegister from "./components/liveRegister"
+import dmList from "./components/dmList.vue";
 
 export default {
   name: "App",
@@ -34,8 +36,9 @@ export default {
     login,
     register,
     home,
-    liveRegister
-  },  
+    liveRegister,
+    dmList
+},  
 
   data: () => ({
     //
