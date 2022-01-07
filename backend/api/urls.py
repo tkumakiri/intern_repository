@@ -13,4 +13,5 @@ urlpatterns = [
     path('lives/<int:pk>', views_lives.LiveView.as_view()),
     path('live_registrations', views_lives.LiveRegistrationView.as_view()),
     path('posts', views_posts.PostsView.as_view()),
+    path('posts/<int:pk>', views_posts.PostView.as_view()),
 ]
