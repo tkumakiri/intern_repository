@@ -21,7 +21,7 @@
         <v-col :cols="colsize1" align="center">
           <v-row justify="center">
             <v-col>
-              <v-btn width="100" class="ms-auto">DM</v-btn>
+              <v-btn width="100" class="ms-auto" @click="onClickDM">DM</v-btn>
             </v-col>
           </v-row>
           <v-row justify="center">
@@ -85,6 +85,11 @@ export default {
         { id: 2, day: "00月00日", name: "ミクライブ" },
       ],
     };
+  },
+  methods: {
+    onClickDM: function () {
+      this.$router.push("/dm");
+    },
   },
 };
 </script>

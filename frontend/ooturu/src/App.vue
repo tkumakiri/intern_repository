@@ -11,9 +11,7 @@
       <Login />
       <Register />
       <LiveRegister /> -->
-      <v-content>
-        <router-view />
-      </v-content>
+      <router-view />
     </v-main>
   </v-app>
 </template>
@@ -30,7 +28,6 @@
 import LoggedInHeader from "./components/LoggedInHeader";
 import NotLoggedInHeader from "./components/NotLoggedInHeader";
 
-
 export default {
   name: "App",
 
@@ -44,20 +41,20 @@ export default {
     // DmList,
     // Search
     LoggedInHeader,
-    NotLoggedInHeader
-},  
-computed: {
-  headerComponent() {
-    switch(this.$route.path) {
-      case '/register':
-        return 'NotLoggedInHeader';
-      case '/':
-        return 'NotLoggedInHeader';
-      default:
-        return 'LoggedInHeader';
-    }
-  }
-},
+    NotLoggedInHeader,
+  },
+  computed: {
+    headerComponent() {
+      switch (this.$route.path) {
+        case "/register":
+          return "NotLoggedInHeader";
+        case "/":
+          return "NotLoggedInHeader";
+        default:
+          return "LoggedInHeader";
+      }
+    },
+  },
 
   data: () => ({
     //
