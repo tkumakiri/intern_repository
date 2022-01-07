@@ -263,7 +263,9 @@ class Post(models.Model):
     reply_target = models.ForeignKey(
         "self",
         verbose_name='リプライ先投稿',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
     )
 
 class Live_picture(models.Model):
