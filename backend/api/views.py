@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status, viewsets, filters
 from rest_framework.views import APIView
 from .serializer import AccountSerializer
-from .models import User
+from .models import User, UserManager
 
 # ユーザ作成のView(POST)
 class AuthRegister(generics.CreateAPIView):
@@ -42,7 +42,6 @@ class AuthInfoGetView(generics.RetrieveAPIView):
 # ユーザ情報更新のView(PUT)
 class AuthInfoUpdateView(generics.UpdateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
-    print(permissions.IsAuthenticated)
     serializer_class = AccountSerializer
     lookup_field = 'email'
     queryset = User.objects.all()
@@ -61,3 +60,10 @@ class AuthInfoUpdateView(generics.UpdateAPIView):
             return instance
         except User.DoesNotExist:
             raise Http404
+
+
+# ユーザー情報取得
+class UserRetrieve(generics.RetrieveAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = User.objects.all()
+    serializer_class = AccountSerializer
