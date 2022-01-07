@@ -275,13 +275,6 @@ class Live_picture(models.Model):
         on_delete=models.CASCADE
     )
 
-    image_name = models.CharField(
-        verbose_name='画像名',
-        max_length=200,
-        blank=False,
-        null=False
-    )
-
     data = models.TextField(
         verbose_name='画像データ',
         null=False
