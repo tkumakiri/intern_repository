@@ -1,10 +1,18 @@
-from django.contrib.auth import authenticate
 import logging
 
+from django.contrib.auth import authenticate
 from django.db.models.aggregates import Count
 from django.db.models.query import Prefetch
 from django.db.utils import IntegrityError
 from django.http.response import Http404
+from rest_framework import (
+    authentication,
+    filters,
+    generics,
+    permissions,
+    status,
+    viewsets,
+)
 from rest_framework.fields import CharField, IntegerField
 from rest_framework.generics import (
     ListAPIView,
@@ -13,15 +21,16 @@ from rest_framework.generics import (
 )
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.relations import PrimaryKeyRelatedField
-from rest_framework.serializers import ModelSerializer
-from rest_framework import authentication, permissions, generics
-from api import errors
-from api.models import Live_register, Live_stream, User, Dm, Follow, Good
-from .serializer import AccountSerializer
 from rest_framework.response import Response
-from rest_framework import status, viewsets, filters
+from rest_framework.serializers import ModelSerializer
+
+from api import errors
+from api.models import Dm, Follow, Good, Live_register, Live_stream, User
+
+from .serializer import AccountSerializer
 
 LOGGER = logging.getLogger("django")
+
 
 class FollowSerializer(ModelSerializer):
     user = AccountSerializer(read_only=True)
@@ -35,14 +44,17 @@ class FollowSerializer(ModelSerializer):
 
     class Meta:
         model = Follow
-        fields = ["id", "user", "user_id","follow", "follow_id"]
+        fields = ["id", "user", "user_id", "follow", "follow_id"]
 
     def create(self, validated_data):
         return User.objects.create_user(request_data=validated_data)
+
+
 #
 # BASIC_QUERYSET_FOLLOW = Follow.objects.annotate(
 #     follows=Count("Follow")
 # )
+
 
 class FollowsRegister(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
@@ -55,4 +67,3 @@ class FollowsRegister(generics.CreateAPIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
