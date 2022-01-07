@@ -18,6 +18,7 @@ from rest_framework.generics import (
     ListAPIView,
     ListCreateAPIView,
     RetrieveAPIView,
+    RetrieveDestroyAPIView,
 )
 from rest_framework.permissions import (
     AllowAny,
@@ -64,15 +65,19 @@ def resolve(validated_data, id_field, entity_field):
         del validated_data[id_field]
 
 
+def basic_queryset_follow():
+    return Follow.objects.all().prefetch_related(
+        Prefetch("user", User.objects.all()),
+        Prefetch("follow", User.objects.all()),
+    )
+
+
 class FollowsView(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = FollowSerializer
 
     def get_queryset(self):
-        queryset = Follow.objects.all().prefetch_related(
-            Prefetch("user", User.objects.all()),
-            Prefetch("follow", User.objects.all()),
-        )
+        queryset = basic_queryset_follow().all()
 
         # 絞り込み
         user = self.request.query_params.get("user")
@@ -92,3 +97,18 @@ class FollowsView(generics.ListCreateAPIView):
             queryset = queryset.filter(follow=target)
 
         return queryset
+
+
+# 特定のフォローの情報を取得・削除する
+class FollowView(RetrieveDestroyAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = FollowSerializer
+
+    def get_queryset(self):
+        return basic_queryset_follow().all()
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            return super().retrieve(request, *args, **kwargs)
+        except Http404:
+            return errors.not_found_response(f"follow of id {kwargs['pk']}")
