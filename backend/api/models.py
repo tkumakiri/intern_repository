@@ -280,7 +280,10 @@ class Good(models.Model):
         on_delete=models.CASCADE
     )
 
-
-
-
-
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields = ["post", "user"],
+                name = "unique_good",
+            ),
+        ]
