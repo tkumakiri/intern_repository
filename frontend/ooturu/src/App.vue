@@ -43,6 +43,10 @@
 <script>
 // import HelloWorld from "./components/HelloWorld";
 import LiveDetail from "./components/LiveDetail";
+import login from "./components/login";
+import register from "./components/register";
+import home from "./components/home";
+import liveResister from "./components/liveResister";
 
 export default {
   name: "App",
@@ -50,8 +54,11 @@ export default {
   components: {
     // HelloWorld,
     LiveDetail,
-  },
-
+    login,
+    register,
+    home,
+    liveResister
+  },  
   data: () => ({
     //
   }),
