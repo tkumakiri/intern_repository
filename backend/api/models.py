@@ -199,6 +199,14 @@ class Live_register(models.Model):
         on_delete=models.CASCADE
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields = ["user", "live"],
+                name = "unique_registration",
+            ),
+        ]
+
 class Post(models.Model):
     text = models.TextField(
         verbose_name='内容',
