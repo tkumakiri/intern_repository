@@ -4,8 +4,14 @@
 
     <v-main>
       <!-- <HelloWorld /> -->
-      <!-- <LiveDetail /> -->
+      <search />
+      <dmList />
+      <LiveDetail />
       <!-- <Myprofile /> -->
+      <home />
+      <login />
+      <register />
+      <liveRegister />
       <v-content>
         <router-view />
       </v-content>
@@ -16,9 +22,12 @@
 <script>
 // import HelloWorld from "./components/HelloWorld";
 import LiveDetail from "./components/LiveDetail";
-import login from './components/login'
-import register from './components/register';
-import home from './components/home'
+import login from "./components/login";
+import register from "./components/register";
+import home from "./components/home";
+import liveRegister from "./components/liveRegister"
+import dmList from "./components/dmList";
+import search from "./components/search";
 
 export default {
   name: "App",
@@ -28,8 +37,11 @@ export default {
     LiveDetail,
     login,
     register,
-    home
-  },  
+    home,
+    liveRegister,
+    dmList,
+    search
+},  
 
   data: () => ({
     //

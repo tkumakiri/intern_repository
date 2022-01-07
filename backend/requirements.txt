@@ -1,1 +1,6 @@
 Django~=2.2.4
+authentication
+serializer
+djangorestframework
+djangorestframework-jwt
+django-cors-headers

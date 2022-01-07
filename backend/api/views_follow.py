@@ -1,134 +1,96 @@
 from django.contrib.auth import authenticate
-from django.db import transaction
-from django.http import HttpResponse, Http404
-from rest_framework import authentication, permissions, generics
-from rest_framework_jwt.settings import api_settings
-from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.response import Response
-from rest_framework import status, viewsets, filters
-from rest_framework.views import APIView
-from .serializer import AccountSerializer
-from .models import User, Dm, Follow, Good
+import logging
 
-# FFのAPI
-class FollowsView(generics.UpdateAPIView):
+from django.db.models.aggregates import Count
+from django.db.models.query import Prefetch
+from django.db.utils import IntegrityError
+from django.http.response import Http404
+from rest_framework.fields import CharField, IntegerField
+from rest_framework.generics import (
+    ListAPIView,
+    ListCreateAPIView,
+    RetrieveAPIView,
+)
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.relations import PrimaryKeyRelatedField
+from rest_framework.serializers import ModelSerializer
+
+from api import errors
+from api.models import Live_register, Live_stream, User, Dm, Follow, Good
+
+LOGGER = logging.getLogger("django")
+
+# ユーザーの Serializer
+# TODO: 適当な場所に移動させるべし
+class UserSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        # TODO: 現状モデルに icon がない
+        fields = ["id", "username", "email", "profile"]
+
+# FFのSerializer
+class FollowSerializer(ModelSerializer):
+    #registerers = IntegerField(read_only=True)
+    user = UserSerializer(read_only=True)
+    user_id = PrimaryKeyRelatedField(
+        queryset=User.objects.all(), write_only=True
+    )
+
+    class Meta:
+        model = Follow
+        fields = [
+            "id",
+	    "user",
+            "follow",
+        ]
+
+
+BASIC_QUERYSET_FOLLOW = Follow.objects.annotate(
+    follows=Count("Follow")
+)
+
+# フォローを一覧 / 検索する
+class FollowsView(ListAPIView):
+    permission_classes = (AllowAny,)
     serializer_class = FollowSerializer
-    queryset = Follow.objects.all()
 
-    def followers(self, request):
-        follower = request.user
-        following = self.get_object()
-        # userまたはtargetに指定されたユーザーが見つからない
-        if follower.DoesNotExist or following.DoesNotExist:
-            return Response(data={
-            {
-              "code": 6002,
-              "error": "user not found"
-            },
-            status=status.HTTP_404_NOT_FOUND)
-        else:
-            return Response(data={
-                'id': self.id,
-                "user": {
-                  'username': request.user.username,
-                  'email': request.user.email,
-                  'profile': request.user.profile,
-                  }
-                "target": {
-                  'username': request.target.username,
-                  'email': request.target.email,
-                  'profile': request.target.profile,
-                  }
-                },
-                status=status.HTTP_200_OK)
+    def get_queryset(self):
+        queryset = BASIC_QUERYSET_FOLLOW.all()
 
-    def follow(self, request):
-        follower = request.user
-        following = self.get_object()
-        # ログインしていない
-        if :
-            return Response(data={
-            {
-              "code": 1001,
-              "error": "no active user"
-            },
-            status=status.HTTP_401_UNAUTHORIZED)
-        # 自分ではないユーザーからフォローしようとした
-        elif:
-            return Response(data={
-            {
-              "code": 6001,
-              "error": "invalid user specified"
-            },
-            status=status.HTTP_401_UNAUTHORIZED)
-        # 対称となるユーザーが見つからない
-        elif Follow.DoesNotExist:
-            return Response(data={
-            {
-              "code": 6002,
-              "error": "user not found"
-            },
-            status=status.HTTP_404_NOT_FOUND)
-        # すでにフォローしている人をフォローしようとした
-        elif:
-            return Response(data={
-            {
-              "code": 6000,
-              "error": "already followed"
-            },
-            status=status.HTTP_401_UNAUTHORIZED)
-        # フォローする処理をして201を返す
-        else:
-            created = Follow.objects.get_or_create(user=follower, follow=following)
-            return Response(data={
-                'id': self.id,
-                "sender": {
-                  'username': request.user_id.username,
-                  'email': request.user_id.email,
-                  'profile': request.user_id.profile,
-                  },
-                'id': self.id,
-                "receiver": {
-                  'username': request.target_id.username,
-                  'email': request.target_id.email,
-                  'profile': request.target_id.profile,
-                  },
-                "sent_at": request.target_id.sent_at
-                },
-                status=status.HTTP_201_CREATED)
+        # ユーザーを指定して検索する
+        querystr = self.request.query_params.get("user")
+        if querystr is not None:
+            queries = querystr.split(" ")
+            LOGGER.debug("search query: " + ", ".join(queries))
+            for query in queries:
+                queryset = queryset.filter(user__contains=query)
 
-    def unfollow(self, request):
-        follower = request.user
-        following = self.get_object()
-        # ログインしていない
-        if :
-            return Response(data={
-            {
-              "code": 1001,
-              "error": "no active user"
-            },
-            status=status.HTTP_401_UNAUTHORIZED)
-        # 他人がしたフォローを削除しようとした
-        elif:
-            return Response(data={
-            {
-              "code": 6002,
-              "error": "specified follow is not created by user"
-            },
-            status=status.HTTP_401_UNAUTHORIZED)
-        # 解除するフォローが見つからない
-        elif Follow.DoesNotExist:
-            return Response(data={
-            {
-              "code": 6004,
-              "error": "follow not found"
-            },
-        status=status.HTTP_404_NOT_FOUND)
-        # フォロー解除して200を返す
-        else:
-            Follow.objects.get(user=follower, follow=following).delete()
-            return Response(data={
-                'id': self.id,
-                "sender": {
-                },
-                status=status.HTTP_200_OK)
+        follow = self.request.query_params.get("follow")
+        if follow is not None:
+            try:
+                follow = (follow)
+            except ValueError as ex:
+                raise errors.ProcessRequestError(
+                    errors.parse_error_response("follow", follow)
+                ) from ex
+            queryset = queryset.filter(registerers__gte=follow)
+
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        try:
+            return super().list(request, args, kwargs)
+        except errors.ProcessRequestError as ex:
+            return ex.response
+
+# 特定のユーザーのフォロー情報を取得する
+class FollowView(RetrieveAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = LiveSerializer
+    queryset = BASIC_QUERYSET_FOLLOW.all()
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            return super().retrieve(request, *args, **kwargs)
+        except Http404:
+            return errors.not_found_response(f"follow of id {kwargs['pk']}")
