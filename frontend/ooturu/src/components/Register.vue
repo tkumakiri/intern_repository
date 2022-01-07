@@ -54,7 +54,6 @@ export default {
       showPassword: false,
       email: '',
       password: '',
-      password2: '',
       username: '',
       profile: '',
       rules_email: [
