@@ -6,6 +6,10 @@
       <!-- <HelloWorld /> -->
       <!-- <LiveDetail /> -->
       <!-- <Myprofile /> -->
+      <!-- <home />
+      <login />
+      <register />
+      <liveRegister /> -->
       <v-content>
         <router-view />
       </v-content>
@@ -19,7 +23,7 @@ import LiveDetail from "./components/LiveDetail";
 import login from './components/login'
 import register from './components/register';
 import home from './components/home'
-import liveResister from "./compornents/liveResister"
+import liveRegister from "./components/liveRegister.vue"
 
 export default {
   name: "App",
@@ -30,7 +34,7 @@ export default {
     login,
     register,
     home,
-    liveResister
+    liveRegister
   },  
 
   data: () => ({
