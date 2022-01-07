@@ -101,7 +101,7 @@ class FollowsView(generics.ListCreateAPIView):
 
 # 特定のフォローの情報を取得・削除する
 class FollowView(RetrieveDestroyAPIView):
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = FollowSerializer
 
     def get_queryset(self):
