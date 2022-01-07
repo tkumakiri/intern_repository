@@ -23,7 +23,7 @@ import LiveDetail from "./components/LiveDetail";
 import login from './components/login'
 import register from './components/register';
 import home from './components/home'
-import liveRegister from "./components/liveRegister.vue"
+import liveRegister from "./components/liveRegister"
 
 export default {
   name: "App",
