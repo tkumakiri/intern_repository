@@ -38,6 +38,30 @@ def invalid_user_response():
     )
 
 
+def invalid_sender_response():
+    return error_response(
+        status.HTTP_401_UNAUTHORIZED, 4000, "invalid sender specified"
+    )
+
+
+def receiver_not_exist_response():
+    return error_response(
+        status.HTTP_404_NOT_FOUND, 4001, "invalid receiver specified"
+    )
+
+
+def receiver_not_followed_response():
+    return error_response(
+        status.HTTP_401_UNAUTHORIZED, 4002, "receiver not followed by user"
+    )
+
+
+def validation_error_response(details):
+    res = error_response(status.HTTP_400_BAD_REQUEST, -1, "validation error")
+    res.data["details"] = details
+    return res
+
+
 def parse_error_response(param, provided=None):
     # TODO: appropriate error code
     message = f"invalid format for {param}"

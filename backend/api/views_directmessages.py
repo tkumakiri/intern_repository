@@ -1,14 +1,14 @@
-from django.db.models.expressions import ValueRange
 from django.db.models.query import Prefetch
 from django.db.models.query_utils import Q
 from django.http.response import Http404
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
 
 from api import errors, views_users
-from api.models import Dm, User
+from api.models import Dm, Follow, User
 
 
 class DirectMessageSerializer(ModelSerializer):
@@ -104,6 +104,39 @@ class DirectMessagesView(ListCreateAPIView):
             )
 
         return queryset
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except ValidationError as ex:
+            # TODO: sender, receiver が存在しないときも validation error にな
+            # るが、本当は 1001, 4001 を返したい
+            return errors.validation_error_response(ex.detail)
+        except errors.ProcessRequestError as ex:
+            return ex.response
+        except Exception as ex:
+            print(repr(ex))
+            raise
+
+    def perform_create(self, serializer):
+        # 作成前にチェック
+
+        # 自分のユーザーから作成しようとしているか？
+        # Note: この時点では *_id -> * への resolve() は行われていないのに注意
+        if serializer.validated_data["sender_id"] != self.request.user:
+            raise errors.ProcessRequestError(errors.invalid_sender_response())
+
+        # 送信先のユーザーをフォローしているか？
+        receiver = serializer.validated_data["receiver_id"]
+        ff = list(
+            Follow.objects.filter(user=self.request.user, follow=receiver)
+        )
+        if len(ff) == 0:
+            raise errors.ProcessRequestError(
+                errors.receiver_not_followed_response()
+            )
+
+        return super().perform_create(serializer)
 
 
 class DirectMessageView(RetrieveAPIView):
