@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import constraints
 from django.utils import timezone
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser, _user_has_perm
@@ -113,6 +114,14 @@ class Follow(models.Model):
 
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields = ["user", "follow"],
+                name = "unique_follow",
+            ),
+        ]
+
 
 class Dm(models.Model):
     text = models.TextField(
@@ -199,6 +208,14 @@ class Live_register(models.Model):
         on_delete=models.CASCADE
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields = ["user", "live"],
+                name = "unique_registration",
+            ),
+        ]
+
 class Post(models.Model):
     text = models.TextField(
         verbose_name='内容',
@@ -263,7 +280,10 @@ class Good(models.Model):
         on_delete=models.CASCADE
     )
 
-
-
-
-
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields = ["post", "user"],
+                name = "unique_good",
+            ),
+        ]
