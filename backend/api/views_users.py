@@ -1,6 +1,7 @@
 from datetime import datetime
 from django.http.response import Http404
 from rest_framework import generics, permissions, status
+from rest_framework.fields import CharField
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 
@@ -10,10 +11,10 @@ from api.serializer import AccountSerializer
 
 # ユーザーの Serializer
 class UserSerializer(ModelSerializer):
+    icon = CharField(source="data")
     class Meta:
         model = User
-        # TODO: 現状モデルに icon がない
-        fields = ["id", "username", "email", "profile"]
+        fields = ["id", "username", "email", "profile", "icon"]
 
 
 # ユーザー情報取得
