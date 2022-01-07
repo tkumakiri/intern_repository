@@ -1,38 +1,15 @@
 import logging
 
-from django.contrib.auth import authenticate
-from django.db.models.aggregates import Count
 from django.db.models.query import Prefetch
-from django.db.utils import IntegrityError
 from django.http.response import Http404
-from rest_framework import (
-    authentication,
-    filters,
-    generics,
-    permissions,
-    status,
-    viewsets,
-)
-from rest_framework.fields import CharField, IntegerField
-from rest_framework.generics import (
-    ListAPIView,
-    ListCreateAPIView,
-    RetrieveAPIView,
-    RetrieveDestroyAPIView,
-)
-from rest_framework.permissions import (
-    AllowAny,
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
-)
+from rest_framework import generics
+from rest_framework.generics import RetrieveDestroyAPIView
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.relations import PrimaryKeyRelatedField
-from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 
 from api import errors, views_users
-from api.models import Dm, Follow, Good, Live_register, Live_stream, User
-
-from .serializer import AccountSerializer
+from api.models import Follow, User
 
 LOGGER = logging.getLogger("django")
 

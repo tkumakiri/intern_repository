@@ -1,14 +1,9 @@
-from django.contrib.auth import authenticate
 from django.db import transaction
-from django.http import HttpResponse, Http404
-from rest_framework import authentication, permissions, generics
-from rest_framework_jwt.settings import api_settings
-from rest_framework.exceptions import AuthenticationFailed
+from django.http import Http404
+from rest_framework import permissions, generics, status
 from rest_framework.response import Response
-from rest_framework import status, viewsets, filters
-from rest_framework.views import APIView
 from .serializer import AccountSerializer
-from .models import User, UserManager, Live_register, Live_stream
+from .models import User, Live_register, Live_stream
 import datetime
 
 # ユーザ作成のView(POST)

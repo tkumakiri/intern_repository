@@ -1,15 +1,9 @@
-from functools import reduce
-
 from django.db.models.query import Prefetch
 from django.db.models.query_utils import Q
 from django.http.response import Http404
 from rest_framework.fields import CharField
 from rest_framework.generics import RetrieveAPIView
-from rest_framework.permissions import (
-    AllowAny,
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
-)
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer, Serializer
