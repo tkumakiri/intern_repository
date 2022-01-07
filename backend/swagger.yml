@@ -249,7 +249,7 @@ paths:
                   error:
                     type: string
                     example: specified live not found
-  /lives/registration:
+  /live_registrations:
     post:
       tags:
         - lives
