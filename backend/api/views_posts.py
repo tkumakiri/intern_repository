@@ -2,7 +2,9 @@ from functools import reduce
 
 from django.db.models.query import Prefetch
 from django.db.models.query_utils import Q
+from django.http.response import Http404
 from rest_framework.fields import CharField
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated,
@@ -23,7 +25,36 @@ from api.models import (
     User,
 )
 
-BASIC_QUERYSET_POST = Post.objects.all().prefetch_related("live_picture_set")
+
+def basic_queryset_post(user):
+    # 条件「自分がフォローしているユーザーが書き込んでいる投稿」
+    is_following = Q(
+        author__in=[
+            follow.follow for follow in Follow.objects.all().filter(user=user)
+        ]
+    )
+
+    # 条件「自分が参加登録をしたライブの投稿」
+    is_registering = Q(
+        live__in=[
+            registration.live
+            for registration in Live_register.objects.all().filter(user=user)
+        ]
+    )
+
+    return (
+        Post.objects.all()
+        .prefetch_related("live_picture_set")
+        .filter(is_following | is_registering)
+        .distinct()
+        .prefetch_related(
+            Prefetch(
+                "live_picture_set",
+                Live_picture.objects.only("data").all(),
+                "screenshots",
+            )
+        )
+    )
 
 
 class ScreenshotSerializer(Serializer):
@@ -86,34 +117,7 @@ class PostsView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        # 条件「自分がフォローしているユーザーが書き込んでいる投稿」
-        following = [
-            follow.follow
-            for follow in Follow.objects.all().filter(user=request.user)
-        ]
-        is_following = Q(author__in=following)
-
-        # 条件「自分が参加登録をしたライブの投稿」
-        registering = [
-            registration.live
-            for registration in Live_register.objects.all().filter(
-                user=request.user
-            )
-        ]
-        is_registering = Q(live__in=registering)
-
-        queryset = (
-            BASIC_QUERYSET_POST.all()
-            .filter(is_following | is_registering)
-            .distinct()
-            .prefetch_related(
-                Prefetch(
-                    "live_picture_set",
-                    Live_picture.objects.only("data").all(),
-                    "screenshots",
-                )
-            )
-        )
+        queryset = basic_queryset_post(request.user)
 
         # ここからリクエストによる絞り込み
         # live がある場合
@@ -158,3 +162,18 @@ class PostsView(APIView):
             return errors.error_response(
                 400, -1, f"{ex} not found in request"
             )
+
+
+# 特定の投稿の情報を取得する
+class PostView(RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        return basic_queryset_post(self.request.user).all()
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            return super().retrieve(request, *args, **kwargs)
+        except Http404:
+            return errors.not_found_response(f"post of id {kwargs['pk']}")
