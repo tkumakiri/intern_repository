@@ -4,6 +4,7 @@ from django.db.models.aggregates import Count
 from django.db.models.query import Prefetch
 from django.db.utils import IntegrityError
 from django.http.response import Http404
+from rest_framework.exceptions import NotAuthenticated
 from rest_framework.fields import CharField, IntegerField
 from rest_framework.generics import (
     ListAPIView,
@@ -88,7 +89,7 @@ class LiveView(RetrieveAPIView):
         try:
             return super().retrieve(request, *args, **kwargs)
         except Http404:
-            return errors.not_found_response(f"live of id {kwargs['pk']}")
+            return errors.not_found_response("specified live not found", 3000)
 
 
 # ライブ登録の Serializer
@@ -127,5 +128,24 @@ class LiveRegistrationView(ListCreateAPIView):
         Prefetch("live", BASIC_QUERYSET_LIVE.all())
     )
     serializer_class = LiveRegistrationSerializer
+
+    def perform_create(self, serializer):
+        print(serializer.validated_data)
+
+        # 自分ではないユーザー ID から登録していないことを確認
+        if serializer.validated_data["user_id"] != self.request.user:
+            raise errors.ProcessRequestError(errors.invalid_user_response())
+
+        # TODO: ライブのチケットが有効であることを確認
+
+        return super().perform_create(serializer)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            return super().post(request, *args, **kwargs)
+        except NotAuthenticated:
+            return errors.not_authenticated_response()
+        except errors.ProcessRequestError as ex:
+            return ex.response
 
     # TODO: error 1001, 3001, 3002

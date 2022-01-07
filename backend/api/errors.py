@@ -1,9 +1,15 @@
+import logging
+
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
+
+LOGGER = logging.getLogger("django")
 
 
 # 我々の API の規約に合うようにハンドラを設定する
 def custom_exception_handler(exc, context):
+    LOGGER.info("unhandled exception: %s", repr(exc))
     response = exception_handler(exc, context)
     if response is not None:
         original = response.data
@@ -20,21 +26,33 @@ def error_response(status, code, error):
     return Response({"code": code, "error": error}, status=status)
 
 
+def not_authenticated_response():
+    return error_response(
+        status.HTTP_401_UNAUTHORIZED, 1001, "no active user"
+    )
+
+
+def invalid_user_response():
+    return error_response(
+        status.HTTP_401_UNAUTHORIZED, 3001, "invalid user specified"
+    )
+
+
 def parse_error_response(param, provided=None):
     # TODO: appropriate error code
     message = f"invalid format for {param}"
     if provided is not None:
         message += f": {provided}"
-    return error_response(400, -1, message)
+    return error_response(status.HTTP_400_BAD_REQUEST, -1, message)
 
 
-def not_found_response(requested=None):
+def not_found_response(requested=None, code=-1):
     # TODO: appropriate error code
     message = ""
     if requested is not None:
         message += f"{requested}: "
     message += "not found"
-    return error_response(404, -1, message)
+    return error_response(status.HTTP_404_NOT_FOUND, code, message)
 
 
 class ProcessRequestError(Exception):
