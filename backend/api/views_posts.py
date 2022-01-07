@@ -114,6 +114,26 @@ class PostsView(APIView):
                 )
             )
         )
+
+        # ここからリクエストによる絞り込み
+        # live がある場合
+        live = request.query_params.get("live")
+        if live is not None:
+            try:
+                live = int(live)
+            except ValueError:
+                return errors.parse_error_response("live", live)
+            queryset = queryset.filter(live=Live_stream.objects.get(id=live))
+
+        # author がある場合
+        author = request.query_params.get("author")
+        if author is not None:
+            try:
+                author = int(author)
+            except ValueError:
+                return errors.parse_error_response("author", author)
+            queryset = queryset.filter(author=User.objects.get(id=author))
+
         serializer = PostSerializer(queryset, many=True)
         return Response(serializer.data)
 
