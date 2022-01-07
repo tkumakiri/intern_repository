@@ -1,7 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark> </v-app-bar>
-
+    <component :is="headerComponent"></component>
     <v-main>
       <!-- <HelloWorld /> -->
       <!-- <Search /> -->
@@ -28,6 +27,9 @@
 // import liveRegister from "./components/LiveRegister"
 // import dmList from "./components/DmList";
 // import search from "./components/Search";
+import LoggedInHeader from "./components/LoggedInHeader";
+import NotLoggedInHeader from "./components/NotLoggedInHeader";
+
 
 export default {
   name: "App",
@@ -41,7 +43,21 @@ export default {
     // LiveRegister,
     // DmList,
     // Search
+    LoggedInHeader,
+    NotLoggedInHeader
 },  
+computed: {
+  headerComponent() {
+    switch(this.$route.path) {
+      case '/register':
+        return 'NotLoggedInHeader';
+      case '/':
+        return 'NotLoggedInHeader';
+      default:
+        return 'LoggedInHeader';
+    }
+  }
+},
 
   data: () => ({
     //
