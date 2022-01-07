@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework.views import APIView
 
-from api import errors, views_lives
+from api import errors, views_lives, views_users
 from api.models import (
     Follow,
     Live_picture,
@@ -75,7 +75,7 @@ class ScreenshotSerializer(Serializer):
 class PostSerializer(ModelSerializer):
     screenshots = ScreenshotSerializer(many=True, read_only=True)
 
-    author = views_lives.UserSerializer(read_only=True)
+    author = views_users.UserSerializer(read_only=True)
     live = views_lives.LiveSerializer(read_only=True)
     # FIXME: 自己参照なので参照を解かないことにする
     reply_target = None

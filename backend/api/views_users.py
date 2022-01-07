@@ -2,9 +2,18 @@ from datetime import datetime
 from django.http.response import Http404
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from rest_framework.serializers import ModelSerializer
 
 from api.models import Live_register, Live_stream, User
 from api.serializer import AccountSerializer
+
+
+# ユーザーの Serializer
+class UserSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        # TODO: 現状モデルに icon がない
+        fields = ["id", "username", "email", "profile"]
 
 
 # ユーザー情報取得

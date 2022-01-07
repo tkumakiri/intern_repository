@@ -14,7 +14,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
 
-from api import errors
+from api import errors, views_users
 from api.models import Live_register, Live_stream, User
 
 LOGGER = logging.getLogger("django")
@@ -91,18 +91,9 @@ class LiveView(RetrieveAPIView):
             return errors.not_found_response(f"live of id {kwargs['pk']}")
 
 
-# ユーザーの Serializer
-# TODO: 適当な場所に移動させるべし
-class UserSerializer(ModelSerializer):
-    class Meta:
-        model = User
-        # TODO: 現状モデルに icon がない
-        fields = ["id", "username", "email", "profile"]
-
-
 # ライブ登録の Serializer
 class LiveRegistrationSerializer(ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = views_users.UserSerializer(read_only=True)
     live = LiveSerializer(read_only=True)
     user_id = PrimaryKeyRelatedField(
         queryset=User.objects.all(), write_only=True

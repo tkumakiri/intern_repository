@@ -7,13 +7,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
 
-from api import errors, views_lives
+from api import errors, views_users
 from api.models import Dm, User
 
 
 class DirectMessageSerializer(ModelSerializer):
-    sender = views_lives.UserSerializer(read_only=True)
-    receiver = views_lives.UserSerializer(read_only=True)
+    sender = views_users.UserSerializer(read_only=True)
+    receiver = views_users.UserSerializer(read_only=True)
     sender_id = PrimaryKeyRelatedField(
         queryset=User.objects.all(), write_only=True
     )

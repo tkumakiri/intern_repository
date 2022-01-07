@@ -34,7 +34,7 @@ from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 
-from api import errors, views_lives, views_posts
+from api import errors, views_posts, views_users
 from api.models import Dm, Good, Live_register, Live_stream, Post, User
 
 from .serializer import AccountSerializer
@@ -43,7 +43,7 @@ LOGGER = logging.getLogger("django")
 
 
 class GoodSerializer(ModelSerializer):
-    user = views_lives.UserSerializer(read_only=True)
+    user = views_users.UserSerializer(read_only=True)
     user_id = PrimaryKeyRelatedField(
         queryset=User.objects.all(), write_only=True
     )

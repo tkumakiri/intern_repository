@@ -29,7 +29,7 @@ from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 
-from api import errors, views_lives
+from api import errors, views_users
 from api.models import Dm, Follow, Good, Live_register, Live_stream, User
 
 from .serializer import AccountSerializer
@@ -38,11 +38,11 @@ LOGGER = logging.getLogger("django")
 
 
 class FollowSerializer(ModelSerializer):
-    user = views_lives.UserSerializer(read_only=True)
+    user = views_users.UserSerializer(read_only=True)
     user_id = PrimaryKeyRelatedField(
         queryset=User.objects.all(), write_only=True
     )
-    target = views_lives.UserSerializer(read_only=True, source="follow")
+    target = views_users.UserSerializer(read_only=True, source="follow")
     target_id = PrimaryKeyRelatedField(
         queryset=User.objects.all(), write_only=True
     )
