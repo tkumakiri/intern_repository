@@ -81,7 +81,13 @@ class DirectMessagesView(ListCreateAPIView):
             try:
                 central = User.objects.get(id=int(central))
             except ValueError:
-                return errors.parse_error_response("sender", sender)
+                return errors.parse_error_response("central", central)
+            except User.DoesNotExist:
+                return errors.not_found_response("central")
+
+            # チェック: central は自分である必要がある
+            if central != self.request.user:
+                return errors.invalid_central_response()
             queryset = queryset.filter(
                 Q(sender=central) | Q(receiver=central)
             )
@@ -98,12 +104,35 @@ class DirectMessagesView(ListCreateAPIView):
                 target = User.objects.get(id=int(target))
             except ValueError:
                 return errors.parse_error_response("target", target)
+            except User.DoesNotExist:
+                return errors.not_found_response("target")
+
+            # チェック: central と target に FF 関係が必要
+            ff = list(
+                Follow.objects.all()
+                .filter(
+                    Q(user=central, follow=target)
+                    | Q(user=target, follow=central)
+                )
+                .distinct()
+            )
+            if len(ff) == 0:
+                raise errors.ProcessRequestError(
+                    errors.central_target_no_ff_response()
+                )
+
             queryset = queryset.filter(
                 Q(receiver=central, sender=target)
                 | Q(receiver=target, sender=central)
             )
 
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        try:
+            return super().list(request, *args, **kwargs)
+        except errors.ProcessRequestError as ex:
+            return ex.response
 
     def create(self, request, *args, **kwargs):
         try:

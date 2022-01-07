@@ -26,6 +26,29 @@ def error_response(status, code, error):
     return Response({"code": code, "error": error}, status=status)
 
 
+def parse_error_response(param, provided=None):
+    # TODO: appropriate error code
+    message = f"invalid format for {param}"
+    if provided is not None:
+        message += f": {provided}"
+    return error_response(status.HTTP_400_BAD_REQUEST, -1, message)
+
+
+def not_found_response(requested=None, code=-1):
+    # TODO: appropriate error code
+    message = ""
+    if requested is not None:
+        message += f"{requested}: "
+    message += "not found"
+    return error_response(status.HTTP_404_NOT_FOUND, code, message)
+
+
+def validation_error_response(details):
+    res = error_response(status.HTTP_400_BAD_REQUEST, -1, "validation error")
+    res.data["details"] = details
+    return res
+
+
 def not_authenticated_response():
     return error_response(
         status.HTTP_401_UNAUTHORIZED, 1001, "no active user"
@@ -56,27 +79,18 @@ def receiver_not_followed_response():
     )
 
 
-def validation_error_response(details):
-    res = error_response(status.HTTP_400_BAD_REQUEST, -1, "validation error")
-    res.data["details"] = details
-    return res
+def invalid_central_response():
+    return error_response(
+        status.HTTP_401_UNAUTHORIZED, 4003, "invalid central specified"
+    )
 
 
-def parse_error_response(param, provided=None):
-    # TODO: appropriate error code
-    message = f"invalid format for {param}"
-    if provided is not None:
-        message += f": {provided}"
-    return error_response(status.HTTP_400_BAD_REQUEST, -1, message)
-
-
-def not_found_response(requested=None, code=-1):
-    # TODO: appropriate error code
-    message = ""
-    if requested is not None:
-        message += f"{requested}: "
-    message += "not found"
-    return error_response(status.HTTP_404_NOT_FOUND, code, message)
+def central_target_no_ff_response():
+    return error_response(
+        status.HTTP_401_UNAUTHORIZED,
+        4004,
+        "no ff relation between central and target",
+    )
 
 
 class ProcessRequestError(Exception):
