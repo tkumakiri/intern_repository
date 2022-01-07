@@ -1,8 +1,8 @@
 from django.conf.urls import include, url
 from django.urls import path
 from rest_framework import routers
-from .views import AuthRegister, AuthInfoGetView, AuthInfoUpdateView, UserRetrieve
 from . import views_lives
+from .views import AuthRegister, AuthInfoGetView, AuthInfoUpdateView, UserRetrieve
 
 urlpatterns = [
     path('users/', AuthRegister.as_view()),
