@@ -66,8 +66,29 @@ def resolve(validated_data, id_field, entity_field):
 
 class FollowsView(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    queryset = Follow.objects.all().prefetch_related(
-        Prefetch("user", User.objects.all()),
-        Prefetch("follow", User.objects.all()),
-    )
     serializer_class = FollowSerializer
+
+    def get_queryset(self):
+        queryset = Follow.objects.all().prefetch_related(
+            Prefetch("user", User.objects.all()),
+            Prefetch("follow", User.objects.all()),
+        )
+
+        # 絞り込み
+        user = self.request.query_params.get("user")
+        if user is not None:
+            try:
+                user = User.objects.get(id=int(user))
+            except ValueError:
+                return errors.parse_error_response("user", user)
+            queryset = queryset.filter(user=user)
+
+        target = self.request.query_params.get("target")
+        if target is not None:
+            try:
+                target = User.objects.get(id=int(target))
+            except ValueError:
+                return errors.parse_error_response("target", target)
+            queryset = queryset.filter(follow=target)
+
+        return queryset
