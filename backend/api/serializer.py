@@ -1,7 +1,7 @@
 from django.contrib.auth import update_session_auth_hash
 from rest_framework import serializers
 
-from .models import User
+from .models import User, Follow, Dm, Good
 
 
 class AccountSerializer(serializers.ModelSerializer):
@@ -31,3 +31,23 @@ class AccountSerializer(serializers.ModelSerializer):
             instance = super().update(instance, validated_data)
         instance.save()
         return instance
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('email', 'profile')
+
+class FollowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Follow
+        fields = ('user', 'follow')
+
+class DmSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Dm
+        fields = ('text', 'sender', 'sent_at', 'receiver')
+
+class GoodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Good
+        fields = ('post', 'user')
