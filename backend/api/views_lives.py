@@ -1,14 +1,21 @@
 import logging
 
 from django.db.models.aggregates import Count
+from django.db.models.query import Prefetch
+from django.db.utils import IntegrityError
 from django.http.response import Http404
-from rest_framework.fields import IntegerField
-from rest_framework.generics import ListAPIView, RetrieveAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.fields import CharField, IntegerField
+from rest_framework.generics import (
+    ListAPIView,
+    ListCreateAPIView,
+    RetrieveAPIView,
+)
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
 
 from api import errors
-from api.models import Live_stream
+from api.models import Live_register, Live_stream, User
 
 LOGGER = logging.getLogger("django")
 
@@ -17,7 +24,7 @@ LOGGER = logging.getLogger("django")
 #
 # API の結果に合わせ、モデルに registerers を追加している。
 class LiveSerializer(ModelSerializer):
-    registerers = IntegerField()
+    registerers = IntegerField(read_only=True)
 
     class Meta:
         model = Live_stream
@@ -82,3 +89,52 @@ class LiveView(RetrieveAPIView):
             return super().retrieve(request, *args, **kwargs)
         except Http404:
             return errors.not_found_response(f"live of id {kwargs['pk']}")
+
+
+# ユーザーの Serializer
+# TODO: 適当な場所に移動させるべし
+class UserSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        # TODO: 現状モデルに icon がない
+        fields = ["id", "username", "email", "profile"]
+
+
+# ライブ登録の Serializer
+class LiveRegistrationSerializer(ModelSerializer):
+    user = UserSerializer(read_only=True)
+    live = LiveSerializer(read_only=True)
+    user_id = PrimaryKeyRelatedField(
+        queryset=User.objects.all(), write_only=True
+    )
+    live_id = PrimaryKeyRelatedField(
+        queryset=Live_stream.objects.all(), write_only=True
+    )
+
+    class Meta:
+        model = Live_register
+        fields = ["id", "user", "user_id", "live", "live_id"]
+        depth = 1
+
+    def create(self, validated_data):
+        resolve(validated_data, "user_id", "user")
+        resolve(validated_data, "live_id", "live")
+        return super().create(validated_data)
+
+
+def resolve(validated_data, id_field, entity_field):
+    resolved = validated_data.get(id_field)
+    if resolved is not None:
+        validated_data[entity_field] = resolved
+        del validated_data[id_field]
+
+
+# ライブの参加登録を行う
+class LiveRegistrationView(ListCreateAPIView):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    queryset = Live_register.objects.all().prefetch_related(
+        Prefetch("live", BASIC_QUERYSET_LIVE.all())
+    )
+    serializer_class = LiveRegistrationSerializer
+
+    # TODO: error 1001, 3001, 3002
