@@ -3,6 +3,7 @@ from django.urls import path
 from rest_framework import routers
 from . import views_lives
 from .views import AuthRegister, AuthInfoGetView, AuthInfoUpdateView, UserRetrieve
+from .views_follow import FollowsView
 
 urlpatterns = [
     path('users/', AuthRegister.as_view()),
@@ -12,4 +13,8 @@ urlpatterns = [
     path('lives', views_lives.LivesView.as_view()),
     path('lives/<int:pk>', views_lives.LiveView.as_view()),
     path('live_registrations', views_lives.LiveRegistrationView.as_view()),
+
+    path('follows/<int:pk>', FollowsView.as_view()),
+    # path('follows/<int:pk>', FollowsView.as_view()),
+
 ]
