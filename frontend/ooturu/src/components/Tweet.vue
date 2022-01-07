@@ -85,6 +85,9 @@
             </v-row>
           </div>
         </div>
+        <v-row justify="center">
+          <v-btn>投稿</v-btn>
+        </v-row>
       </v-card>
     </v-row>
   </v-app>
