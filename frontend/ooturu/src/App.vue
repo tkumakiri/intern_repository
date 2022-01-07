@@ -4,6 +4,7 @@
 
     <v-main>
       <!-- <HelloWorld /> -->
+      <search />
       <dmList />
       <LiveDetail />
       <!-- <Myprofile /> -->
@@ -25,7 +26,8 @@ import login from "./components/login";
 import register from "./components/register";
 import home from "./components/home";
 import liveRegister from "./components/liveRegister"
-import dmList from "./components/dmList.vue";
+import dmList from "./components/dmList";
+import search from "./components/search";
 
 export default {
   name: "App",
@@ -37,7 +39,8 @@ export default {
     register,
     home,
     liveRegister,
-    dmList
+    dmList,
+    search
 },  
 
   data: () => ({
