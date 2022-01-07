@@ -10,4 +10,5 @@ urlpatterns = [
     path('auth/auth_update/', AuthInfoUpdateView.as_view()),
     path('users/<int:pk>/', UserRetrieve.as_view()),
     path('lives', views_lives.LivesView.as_view()),
+    path('lives/<int:pk>', views_lives.LiveView.as_view()),
 ]

@@ -1,8 +1,9 @@
 import logging
 
 from django.db.models.aggregates import Count
+from django.http.response import Http404
 from rest_framework.fields import IntegerField
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.serializers import ModelSerializer
 
@@ -68,3 +69,16 @@ class LivesView(ListAPIView):
             return super().list(request, args, kwargs)
         except errors.ProcessRequestError as ex:
             return ex.response
+
+
+# 特定のライブの情報を取得する
+class LiveView(RetrieveAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = LiveSerializer
+    queryset = BASIC_QUERYSET_LIVE.all()
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            return super().retrieve(request, *args, **kwargs)
+        except Http404:
+            return errors.not_found_response(f"live of id {kwargs['pk']}")
