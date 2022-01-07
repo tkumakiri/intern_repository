@@ -13,7 +13,12 @@ from rest_framework import (
     status,
     viewsets,
 )
-from rest_framework.fields import CharField, IntegerField
+from rest_framework.fields import (
+    CharField,
+    IntegerField,
+    SerializerMethodField,
+    empty,
+)
 from rest_framework.generics import (
     ListAPIView,
     ListCreateAPIView,
@@ -29,32 +34,38 @@ from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 
-from api import errors, views_lives
-from api.models import Dm, Follow, Good, Live_register, Live_stream, User
+from api import errors, views_lives, views_posts
+from api.models import Dm, Good, Live_register, Live_stream, Post, User
 
 from .serializer import AccountSerializer
 
 LOGGER = logging.getLogger("django")
 
 
-class FollowSerializer(ModelSerializer):
+class GoodSerializer(ModelSerializer):
     user = views_lives.UserSerializer(read_only=True)
     user_id = PrimaryKeyRelatedField(
         queryset=User.objects.all(), write_only=True
     )
-    target = views_lives.UserSerializer(read_only=True, source="follow")
-    target_id = PrimaryKeyRelatedField(
-        queryset=User.objects.all(), write_only=True
+
+    post = views_posts.PostSerializer(read_only=True)
+    post_id = PrimaryKeyRelatedField(
+        queryset=views_posts.basic_queryset_post_noauth(), write_only=True
     )
 
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+
     class Meta:
-        model = Follow
-        fields = ["id", "user", "user_id", "target", "target_id"]
+        model = Good
+        fields = ["id", "user", "user_id", "post", "post_id"]
         depth = 1
 
     def create(self, validated_data):
         resolve(validated_data, "user_id", "user")
-        resolve(validated_data, "target_id", "follow")
+        resolve(validated_data, "post_id", "post")
+        # TODO: いいねする権限があるか確認する
         return super().create(validated_data)
 
 
@@ -65,19 +76,22 @@ def resolve(validated_data, id_field, entity_field):
         del validated_data[id_field]
 
 
-def basic_queryset_follow():
-    return Follow.objects.all().prefetch_related(
+def basic_queryset_good(user):
+    return Good.objects.all().prefetch_related(
         Prefetch("user", User.objects.all()),
-        Prefetch("follow", User.objects.all()),
+        Prefetch("post", views_posts.basic_queryset_post(user).all()),
     )
 
 
-class FollowsView(generics.ListCreateAPIView):
-    permission_classes = (IsAuthenticatedOrReadOnly,)
-    serializer_class = FollowSerializer
+class GoodsView(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs["user"] = self.request.user
+        return GoodSerializer(*args, **kwargs)
 
     def get_queryset(self):
-        queryset = basic_queryset_follow().all()
+        queryset = basic_queryset_good(self.request.user).all()
 
         # 絞り込み
         user = self.request.query_params.get("user")
@@ -88,27 +102,30 @@ class FollowsView(generics.ListCreateAPIView):
                 return errors.parse_error_response("user", user)
             queryset = queryset.filter(user=user)
 
-        target = self.request.query_params.get("target")
-        if target is not None:
+        post = self.request.query_params.get("post")
+        if post is not None:
             try:
-                target = User.objects.get(id=int(target))
+                post = Post.objects.get(id=int(post))
             except ValueError:
-                return errors.parse_error_response("target", target)
-            queryset = queryset.filter(follow=target)
+                return errors.parse_error_response("post", post)
+            queryset = queryset.filter(post=post)
 
         return queryset
 
 
-# 特定のフォローの情報を取得・削除する
-class FollowView(RetrieveDestroyAPIView):
-    permission_classes = (IsAuthenticatedOrReadOnly,)
-    serializer_class = FollowSerializer
+# 特定のいいねの情報を取得・削除する
+class GoodView(RetrieveDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs["user"] = self.request.user
+        return GoodSerializer(*args, **kwargs)
 
     def get_queryset(self):
-        return basic_queryset_follow().all()
+        return basic_queryset_good(self.request.user).all()
 
     def retrieve(self, request, *args, **kwargs):
         try:
             return super().retrieve(request, *args, **kwargs)
         except Http404:
-            return errors.not_found_response(f"follow of id {kwargs['pk']}")
+            return errors.not_found_response(f"good of id {kwargs['pk']}")

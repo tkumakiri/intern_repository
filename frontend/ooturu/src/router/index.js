@@ -3,13 +3,15 @@ import Router from "vue-router";
 
 import LiveDetail from "../components/LiveDetail.vue";
 import Myprofile from "../components/Myprofile.vue";
+import Userprofile from "../components/Userprofile.vue";
+import Tweet from "../components/Tweet.vue";
 import Login from "../components/Login.vue";
 import Register from "../components/Register";
 import Home from "../components/Home";
-import LiveRegister from "../components/LiveRegister"
+import LiveRegister from "../components/LiveRegister";
 import DmList from "../components/DmList";
 import Search from "../components/Search";
-
+import DM from "../components/DM";
 
 Vue.use(Router);
 
@@ -30,6 +32,16 @@ export default new Router({
       path: "/myprofile",
       name: "myprofile",
       component: Myprofile,
+    },
+    {
+      path: "/userprofile",
+      name: "userprofile",
+      component: Userprofile,
+    },
+    {
+      path: "/tweet",
+      name: "tweet",
+      component: Tweet,
     },
     {
       path: "/register",
@@ -55,6 +67,11 @@ export default new Router({
       path: "/search",
       name: "search",
       component: Search,
+    },
+    {
+      path: "/dm",
+      name: "dm",
+      component: DM,
     },
   ],
 });

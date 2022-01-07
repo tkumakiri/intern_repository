@@ -26,7 +26,18 @@ from api.models import (
 )
 
 
-def basic_queryset_post(user):
+# これはセキュリティ無視なので注意
+def basic_queryset_post_noauth():
+    return Post.objects.all().prefetch_related(
+        Prefetch(
+            "live_picture_set",
+            Live_picture.objects.only("data").all(),
+            "screenshots",
+        )
+    )
+
+
+def queryset_filter_is_allowed(user):
     # 条件「自分がフォローしているユーザーが書き込んでいる投稿」
     is_following = Q(
         author__in=[
@@ -42,18 +53,14 @@ def basic_queryset_post(user):
         ]
     )
 
+    return is_following | is_registering
+
+
+def basic_queryset_post(user):
     return (
-        Post.objects.all()
-        .prefetch_related("live_picture_set")
-        .filter(is_following | is_registering)
+        basic_queryset_post_noauth()
+        .filter(queryset_filter_is_allowed(user))
         .distinct()
-        .prefetch_related(
-            Prefetch(
-                "live_picture_set",
-                Live_picture.objects.only("data").all(),
-                "screenshots",
-            )
-        )
     )
 
 
