@@ -13,7 +13,5 @@ urlpatterns = [
     path('lives', views_lives.LivesView.as_view()),
     path('lives/<int:pk>', views_lives.LiveView.as_view()),
     path('live_registrations', views_lives.LiveRegistrationView.as_view()),
-
-    path('follows/', views_follow.FollowsRegister.as_view()),
-
+    path('follows', views_follow.FollowsView.as_view()),
 ]

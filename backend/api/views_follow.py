@@ -19,12 +19,16 @@ from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveAPIView,
 )
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 
-from api import errors
+from api import errors, views_lives
 from api.models import Dm, Follow, Good, Live_register, Live_stream, User
 
 from .serializer import AccountSerializer
@@ -33,37 +37,37 @@ LOGGER = logging.getLogger("django")
 
 
 class FollowSerializer(ModelSerializer):
-    user = AccountSerializer(read_only=True)
+    user = views_lives.UserSerializer(read_only=True)
     user_id = PrimaryKeyRelatedField(
         queryset=User.objects.all(), write_only=True
     )
-    follow = AccountSerializer(read_only=True)
-    follow_id = PrimaryKeyRelatedField(
+    target = views_lives.UserSerializer(read_only=True, source="follow")
+    target_id = PrimaryKeyRelatedField(
         queryset=User.objects.all(), write_only=True
     )
 
     class Meta:
         model = Follow
-        fields = ["id", "user", "user_id", "follow", "follow_id"]
+        fields = ["id", "user", "user_id", "target", "target_id"]
+        depth = 1
 
     def create(self, validated_data):
-        return User.objects.create_user(request_data=validated_data)
+        resolve(validated_data, "user_id", "user")
+        resolve(validated_data, "target_id", "follow")
+        return super().create(validated_data)
 
 
-#
-# BASIC_QUERYSET_FOLLOW = Follow.objects.annotate(
-#     follows=Count("Follow")
-# )
+def resolve(validated_data, id_field, entity_field):
+    resolved = validated_data.get(id_field)
+    if resolved is not None:
+        validated_data[entity_field] = resolved
+        del validated_data[id_field]
 
 
-class FollowsRegister(generics.CreateAPIView):
-    permission_classes = (permissions.AllowAny,)
-    queryset = Follow.objects.all()
+class FollowsView(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    queryset = Follow.objects.all().prefetch_related(
+        Prefetch("user", User.objects.all()),
+        Prefetch("follow", User.objects.all()),
+    )
     serializer_class = FollowSerializer
-
-    def post(self, request, format=None):
-        serializer = FollowSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
