@@ -21,7 +21,7 @@
             v-model="password"
           />
           <v-card-actions class="justify-center">
-            <v-btn class="primary" @click="submit">ログイン</v-btn>
+            <v-btn class="primary" to="/home" @click="submit">ログイン</v-btn>
           </v-card-actions>
         </v-form>
       </v-card-text>
@@ -54,3 +54,4 @@ export default {
   },
 };
 </script>
+

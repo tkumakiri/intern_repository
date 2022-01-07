@@ -15,7 +15,6 @@
                 </v-card>
                 
             </v-list-item>
-
         </v-list>
     </v-app>
 </template>
