@@ -20,19 +20,20 @@ class UserManager(BaseUserManager):
         if request_data.get('profile'):
             profile = request_data['profile']
 
+        data = None
+        if request_data.get('data'):
+            data = request_data['data']
+
         user = self.model(
             username=request_data['username'],
             email=self.normalize_email(request_data['email']),
             is_active=True,
             last_login=now,
             date_joined=now,
-            profile=profile
+            profile=profile,
+            data=data
         )
 
-    # if request_data.get('image_name'):
-        if request_data.get('data'):
-            # user.image_name = request_data['image_name']
-            user.data = request_data['data']
 
         user.set_password(request_data['password'])
         user.save(using=self._db)

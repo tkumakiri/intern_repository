@@ -50,8 +50,7 @@ class AuthInfoGetView(generics.RetrieveAPIView):
             'username': request.user.username,
             'email': request.user.email,
             'profile': request.user.profile,
-            'image_name': request.user.image_name,
-            'data': request.user.data,
+            'icon': request.user.data,
             'old_live_list': old_live_list,
             'new_live_list': new_live_list
             },
