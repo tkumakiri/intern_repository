@@ -716,7 +716,7 @@ paths:
                     error: no active user
                 他人がしたフォローを削除しようとした:
                   value:
-                    code: 6002
+                    code: 6003
                     error: specified follow is not created by user
         "404":
           description: 解除するフォローが見つからない。
@@ -888,7 +888,7 @@ paths:
                     error: no active user
                 他人がしたいいねを削除しようとした:
                   value:
-                    code: 7002
+                    code: 7003
                     error: specified good is not created by user
         "404":
           description: 解除するいいねが見つからない。

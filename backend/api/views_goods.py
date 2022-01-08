@@ -75,6 +75,10 @@ class GoodsView(generics.ListCreateAPIView):
                 raise errors.ProcessRequestError(
                     errors.parse_error_response("user", user)
                 )
+            except User.DoesNotExist:
+                raise errors.ProcessRequestError(
+                    errors.good_query_user_not_found()
+                )
             queryset = queryset.filter(user=user)
 
         post = self.request.query_params.get("post")
@@ -84,6 +88,10 @@ class GoodsView(generics.ListCreateAPIView):
             except ValueError:
                 raise errors.ProcessRequestError(
                     errors.parse_error_response("post", post)
+                )
+            except User.DoesNotExist:
+                raise errors.ProcessRequestError(
+                    errors.good_query_user_not_found()
                 )
             queryset = queryset.filter(post=post)
 

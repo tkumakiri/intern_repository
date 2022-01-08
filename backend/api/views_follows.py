@@ -66,6 +66,10 @@ class FollowsView(generics.ListCreateAPIView):
                 raise errors.ProcessRequestError(
                     errors.parse_error_response("user", user)
                 )
+            except User.DoesNotExist:
+                raise errors.ProcessRequestError(
+                    errors.follow_query_user_not_found()
+                )
             queryset = queryset.filter(user=user)
 
         target = self.request.query_params.get("target")
@@ -75,6 +79,10 @@ class FollowsView(generics.ListCreateAPIView):
             except ValueError:
                 return errors.ProcessRequestError(
                     errors.parse_error_response("target", target)
+                )
+            except User.DoesNotExist:
+                raise errors.ProcessRequestError(
+                    errors.follow_query_user_not_found()
                 )
             queryset = queryset.filter(follow=target)
 
