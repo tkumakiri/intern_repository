@@ -26,5 +26,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/login', obtain_jwt_token),
     path('api', include('api.urls')),
-    path('index', serve_vue)
+    path('', serve_vue)
 ]
