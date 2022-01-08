@@ -1,1 +1,1 @@
-web: gunicorn apiserver.wsgi --log-file -
+web: sh -c 'cd backend && gunicorn apiserver.wsgi --log-file -'
