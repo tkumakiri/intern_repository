@@ -14,7 +14,7 @@ class UserSerializer(ModelSerializer):
     icon = CharField(source="data")
     class Meta:
         model = User
-        fields = ["id", "username", "email", "profile", "data"]
+        fields = ["id", "username", "email", "profile", "icon"]
 
 
 # ユーザー情報取得
