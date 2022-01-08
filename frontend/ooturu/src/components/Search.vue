@@ -44,7 +44,18 @@ export default {
     data() {
         return{
             title: '',
-            lives: []
+            lives: [
+              {
+                    date: '2021-1-6',
+                    title: 'XXXXライブ',
+                    detail: '999'
+                },
+                {
+                    date: '2021-1-7',
+                    title: '〇〇ライブ',
+                    detail: '0'
+                }
+            ]
         }
     },
     mounted: function(){
