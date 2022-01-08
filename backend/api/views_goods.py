@@ -72,7 +72,13 @@ class GoodsView(generics.ListCreateAPIView):
             try:
                 user = User.objects.get(id=int(user))
             except ValueError:
-                return errors.parse_error_response("user", user)
+                raise errors.ProcessRequestError(
+                    errors.parse_error_response("user", user)
+                )
+            except User.DoesNotExist:
+                raise errors.ProcessRequestError(
+                    errors.good_query_user_not_found()
+                )
             queryset = queryset.filter(user=user)
 
         post = self.request.query_params.get("post")
@@ -80,10 +86,22 @@ class GoodsView(generics.ListCreateAPIView):
             try:
                 post = Post.objects.get(id=int(post))
             except ValueError:
-                return errors.parse_error_response("post", post)
+                raise errors.ProcessRequestError(
+                    errors.parse_error_response("post", post)
+                )
+            except User.DoesNotExist:
+                raise errors.ProcessRequestError(
+                    errors.good_query_user_not_found()
+                )
             queryset = queryset.filter(post=post)
 
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        try:
+            return super().list(request, *args, **kwargs)
+        except errors.ProcessRequestError as ex:
+            return ex.response
 
     def create(self, request, *args, **kwargs):
         try:

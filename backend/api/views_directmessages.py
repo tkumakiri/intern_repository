@@ -81,13 +81,19 @@ class DirectMessagesView(ListCreateAPIView):
             try:
                 central = User.objects.get(id=int(central))
             except ValueError:
-                return errors.parse_error_response("central", central)
+                raise errors.ProcessRequestError(
+                    errors.parse_error_response("central", central)
+                )
             except User.DoesNotExist:
-                return errors.not_found_response("central")
+                raise errors.ProcessRequestError(
+                    errors.not_found_response("central")
+                )
 
             # チェック: central は自分である必要がある
             if central != self.request.user:
-                return errors.invalid_central_response()
+                raise errors.ProcessRequestError(
+                    errors.invalid_central_response()
+                )
             queryset = queryset.filter(
                 Q(sender=central) | Q(receiver=central)
             )
@@ -95,17 +101,23 @@ class DirectMessagesView(ListCreateAPIView):
         target = self.request.query_params.get("target")
         if target is not None:
             if central is None:
-                return errors.error_response(
-                    400,
-                    -1,
-                    "central must be specified when target is specified",
+                raise errors.ProcessRequestError(
+                    errors.error_response(
+                        400,
+                        -1,
+                        "central must be specified when target is specified",
+                    )
                 )
             try:
                 target = User.objects.get(id=int(target))
             except ValueError:
-                return errors.parse_error_response("target", target)
+                raise errors.ProcessRequestError(
+                    errors.parse_error_response("target", target)
+                )
             except User.DoesNotExist:
-                return errors.not_found_response("target")
+                raise errors.ProcessRequestError(
+                    errors.not_found_response("target")
+                )
 
             # チェック: central と target に FF 関係が必要
             ff = list(

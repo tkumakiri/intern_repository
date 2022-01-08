@@ -107,18 +107,34 @@ def invalid_author_response():
     )
 
 
-def delete_others_follow_response():
+def follow_query_user_not_found():
     return error_response(
         status.HTTP_401_UNAUTHORIZED,
         6002,
+        "user not found",
+    )
+
+
+def delete_others_follow_response():
+    return error_response(
+        status.HTTP_401_UNAUTHORIZED,
+        6003,
         "specified follow is not created by user",
+    )
+
+
+def good_query_user_not_found():
+    return error_response(
+        status.HTTP_401_UNAUTHORIZED,
+        7002,
+        "user not found",
     )
 
 
 def delete_others_good_response():
     return error_response(
         status.HTTP_401_UNAUTHORIZED,
-        7002,
+        7003,
         "specified good is not created by user",
     )
 
