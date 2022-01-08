@@ -9,7 +9,7 @@
             >
                 <v-card width="640px" class="my-2 py-2 mx-auto">
                     <v-list-item-content>
-                        <v-list-item-title v-text="live.date + ' ' + live.title"></v-list-item-title>
+                        <v-list-item-title v-text="live.start_at + ' ' + live.title"></v-list-item-title>
                         <v-list-item-subtitle v-text="live.detail + '人が視聴予定です'"></v-list-item-subtitle>
                     </v-list-item-content>
                 </v-card>
@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import axios from "axios";
 
 export default {
     name: 'App',
@@ -38,6 +39,14 @@ export default {
                 }
             ]
         }
-    }
+    },
+    mounted() {
+        axios
+            .get('lives/')
+            .then((res) => {
+                this.info = res.data;
+                console.log(res.data)
+            });
+    },
 };
 </script>

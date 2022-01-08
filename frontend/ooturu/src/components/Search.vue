@@ -17,6 +17,8 @@
                             color="primary"
                             width="80px"
                             class="mr-4"
+                            v-model="keyword"
+                            @click="search"
                         >検索</v-btn>
                     </template>
                 </v-text-field>
@@ -50,11 +52,13 @@
 </template>
 
 <script>
+import axios from "axios";
 
 export default {
     name: 'App',
     data() {
         return{
+            keyword,
             lives: [
                 {
                     date: '2021-1-6',
@@ -67,6 +71,15 @@ export default {
                     detail: '0'
                 }
             ]
+        }
+    },
+    methods: {
+        search(){
+            axios
+                .get('/lives/live_id')
+                .then((res) => {
+                    this.info = res.data;
+                })
         }
     }
 };
