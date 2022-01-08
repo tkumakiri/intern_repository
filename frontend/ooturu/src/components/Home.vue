@@ -44,7 +44,7 @@ export default {
         axios
             .get('/lives')
             .then((res) => {
-                this.info = res.data;
+                this.lives = res.data;
                 console.log(res.data)
             });
     },

@@ -49,7 +49,7 @@ export default {
     mounted() {
         this.getMyId()
         axios
-            .get('http://vocalotomo.herokuapp.com/directmessages')
+            .get('/directmessages')
             .then((res) => {
                 this.info = res.data;
                 console.log(res.data)
@@ -58,7 +58,7 @@ export default {
     methods: {
         getMyId(){
             axios
-                .get('http://vocalotomo.herokuapp.com/auth/me')
+                .get('/auth/me')
                 .then((res) => {
                     this.loginUser = res.data.id;
                     console.log(res.data.id)
