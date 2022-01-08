@@ -41,6 +41,8 @@ class AuthInfoGetView(generics.RetrieveAPIView):
                 live_a["started_at"] = stream.started_at
                 print(datetime.datetime.now(datetime.timezone.utc))
                 print(stream.started_at)
+                if stream.started_at is None:
+                    continue
                 if stream.started_at < datetime.datetime.now(datetime.timezone.utc):
                     old_live_list.append((live_a))
                 else:
