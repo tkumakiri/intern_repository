@@ -63,7 +63,9 @@ class FollowsView(generics.ListCreateAPIView):
             try:
                 user = User.objects.get(id=int(user))
             except ValueError:
-                return errors.parse_error_response("user", user)
+                raise errors.ProcessRequestError(
+                    errors.parse_error_response("user", user)
+                )
             queryset = queryset.filter(user=user)
 
         target = self.request.query_params.get("target")
@@ -71,7 +73,9 @@ class FollowsView(generics.ListCreateAPIView):
             try:
                 target = User.objects.get(id=int(target))
             except ValueError:
-                return errors.parse_error_response("target", target)
+                return errors.ProcessRequestError(
+                    errors.parse_error_response("target", target)
+                )
             queryset = queryset.filter(follow=target)
 
         return queryset
@@ -79,6 +83,8 @@ class FollowsView(generics.ListCreateAPIView):
     def list(self, request, *args, **kwargs):
         try:
             return super().list(request, *args, **kwargs)
+        except errors.ProcessRequestError as ex:
+            return ex.response
         except IntegrityError:
             return errors.integrity_error_response(["user", "target"])
 
