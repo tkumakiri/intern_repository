@@ -99,6 +99,14 @@ def invalid_author_response():
     )
 
 
+def delete_others_follow_response():
+    return error_response(
+        status.HTTP_401_UNAUTHORIZED,
+        6002,
+        "specified follow is not created by user",
+    )
+
+
 class ProcessRequestError(Exception):
     def __init__(self, response):
         super().__init__(f"custom error: {response}")

@@ -89,3 +89,19 @@ class FollowView(RetrieveDestroyAPIView):
             return super().retrieve(request, *args, **kwargs)
         except Http404:
             return errors.not_found_response(f"follow of id {kwargs['pk']}")
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            res = super().destroy(request, *args, **kwargs)
+            res.data = {}
+            return res
+        except errors.ProcessRequestError as ex:
+            return ex.response
+
+    def perform_destroy(self, instance):
+        if instance.user != self.request.user:
+            raise errors.ProcessRequestError(
+                errors.delete_others_follow_response()
+            )
+
+        return super().perform_destroy(instance)
