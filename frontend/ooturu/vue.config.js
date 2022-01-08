@@ -5,7 +5,7 @@ module.exports = {
   //サーバーを起動した時のルートパス
   publicPath: "/",
   //outputDir起点でindex.htmlを格納する場所を指定
-  indexPath: "app/templates/index.html",
+  indexPath: "api/templates/index.html",
   //outputDir起点でstaticファイルを格納する場所を指定
   assetsDir: "static",
 };
