@@ -2,7 +2,7 @@
   <v-app class="blue-grey lighten-5">
     <v-row justify="center" class="mt-2">
       <v-card width="800">
-        <h1>00月00日開催 ライブ</h1>
+        <h1>{{ livetitle }}</h1>
         <div class="input_body">
           <div class="input_area">
             <!-- <input type="file" name="example" ref="preview" accept="image/*" multiple required> -->
@@ -61,15 +61,7 @@
 
             <br />
             <v-row justify="center">
-              <div v-show="files.length">
-                <button
-                  class="button"
-                  v-on:click="upload"
-                  v-bind:disabled="isPushed"
-                >
-                  {{ button_text }}
-                </button>
-              </div>
+              <div v-show="files.length"></div>
             </v-row>
             <v-row class="mt-5" justify="center">
               <v-col cols="6">
@@ -86,7 +78,9 @@
           </div>
         </div>
         <v-row justify="center">
-          <v-btn>投稿</v-btn>
+          <button class="button" v-on:click="upload" v-bind:disabled="isPushed">
+            {{ button_text }}
+          </button>
         </v-row>
       </v-card>
     </v-row>
@@ -98,6 +92,7 @@ export default {
   name: "Tweet",
   data() {
     return {
+      livetitle: "00月00日開催 ライブ",
       error: "",
       isEnter: false,
       files: [],
@@ -169,7 +164,32 @@ export default {
       this.checkEachFile(files);
     },
     upload: function () {
-      console.log(this.images);
+      const newpost = {
+        id: 0,
+        author: {
+          id: this.$store.getters.id,
+          email: this.$store.getters.email,
+          username: this.$store.getters.username,
+          profile: this.$store.getters.profile,
+          icon: this.$store.getters.icon,
+        },
+        reply_target: "string",
+        live: {
+          id: 0,
+          title: this.livetitle,
+          started_at: "2022-01-08T03:20:33.056Z",
+          live_url: "string",
+          ticket_url: "string",
+          registerers: 0,
+        },
+        text: this.comment,
+        screenshots: this.url,
+        posted_at: "2022-01-08T03:20:33.056Z",
+      };
+      let posts = this.$store.getters.posts;
+      posts.push(newpost);
+      this.$store.commit("setposts", posts);
+      this.$router.push("/livedetail");
     },
   },
 };

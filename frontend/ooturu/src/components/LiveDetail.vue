@@ -33,8 +33,11 @@
               <v-list-item>
                 <div>{{ post.text }}</div>
               </v-list-item>
-              <v-list-item>
-                <v-img src="../assets/testphoto.jpeg"></v-img>
+              <v-list-item
+                v-for="screenshot in post.screenshots"
+                :key="screenshot"
+              >
+                <v-img :src="screenshot"></v-img>
               </v-list-item>
               <v-list-item>
                 <v-list-item-icon class="ml-auto">
@@ -53,6 +56,10 @@
 
 <script>
 export default {
+  mounted: function () {
+    this.posts = this.$store.getters.posts;
+    console.log(this.posts);
+  },
   name: "LiveDetail",
   data() {
     return {
@@ -64,74 +71,75 @@ export default {
         ticket_url: "string",
         registerers: 0,
       },
-      posts: [
-        {
-          id: 0,
-          author: {
-            id: 0,
-            email: "string",
-            username: "ユーザー1",
-            profile: "string",
-            icon: "string",
-          },
-          reply_target: "string",
-          live: {
-            id: 0,
-            title: "string",
-            started_at: "2022-01-07T23:10:43.848Z",
-            live_url: "string",
-            ticket_url: "string",
-            registerers: 0,
-          },
-          text: "最高のライブだった！特に〇〇とかライブ編曲神",
-          screenshots: ["string"],
-          posted_at: "2022-01-07T23:10:43.848Z",
-        },
-        {
-          id: 0,
-          author: {
-            id: 0,
-            email: "string",
-            username: "ユーザー２",
-            profile: "string",
-            icon: "string",
-          },
-          reply_target: "string",
-          live: {
-            id: 0,
-            title: "string",
-            started_at: "2022-01-07T23:10:43.848Z",
-            live_url: "string",
-            ticket_url: "string",
-            registerers: 0,
-          },
-          text: "今回のライブ〇〇さん好きな人は激アツだろうな〜",
-          screenshots: ["string"],
-          posted_at: "2022-01-07T23:10:43.848Z",
-        },
-        {
-          id: 0,
-          author: {
-            id: 0,
-            email: "string",
-            username: "ユーザー3",
-            profile: "string",
-            icon: "string",
-          },
-          reply_target: "string",
-          live: {
-            id: 0,
-            title: "string",
-            started_at: "2022-01-07T23:10:43.848Z",
-            live_url: "string",
-            ticket_url: "string",
-            registerers: 0,
-          },
-          text: "最高だった！",
-          screenshots: ["string"],
-          posted_at: "2022-01-07T23:10:43.848Z",
-        },
-      ],
+      // posts: [
+      //   {
+      //     id: 0,
+      //     author: {
+      //       id: 0,
+      //       email: "string",
+      //       username: "ユーザー1",
+      //       profile: "string",
+      //       icon: "string",
+      //     },
+      //     reply_target: "string",
+      //     live: {
+      //       id: 0,
+      //       title: "string",
+      //       started_at: "2022-01-07T23:10:43.848Z",
+      //       live_url: "string",
+      //       ticket_url: "string",
+      //       registerers: 0,
+      //     },
+      //     text: "最高のライブだった！特に〇〇とかライブ編曲神",
+      //     screenshots: ["string"],
+      //     posted_at: "2022-01-07T23:10:43.848Z",
+      //   },
+      //   {
+      //     id: 0,
+      //     author: {
+      //       id: 0,
+      //       email: "string",
+      //       username: "ユーザー２",
+      //       profile: "string",
+      //       icon: "string",
+      //     },
+      //     reply_target: "string",
+      //     live: {
+      //       id: 0,
+      //       title: "string",
+      //       started_at: "2022-01-07T23:10:43.848Z",
+      //       live_url: "string",
+      //       ticket_url: "string",
+      //       registerers: 0,
+      //     },
+      //     text: "今回のライブ〇〇さん好きな人は激アツだろうな〜",
+      //     screenshots: ["string"],
+      //     posted_at: "2022-01-07T23:10:43.848Z",
+      //   },
+      //   {
+      //     id: 0,
+      //     author: {
+      //       id: 0,
+      //       email: "string",
+      //       username: "ユーザー3",
+      //       profile: "string",
+      //       icon: "string",
+      //     },
+      //     reply_target: "string",
+      //     live: {
+      //       id: 0,
+      //       title: "string",
+      //       started_at: "2022-01-07T23:10:43.848Z",
+      //       live_url: "string",
+      //       ticket_url: "string",
+      //       registerers: 0,
+      //     },
+      //     text: "最高だった！",
+      //     screenshots: ["string"],
+      //     posted_at: "2022-01-07T23:10:43.848Z",
+      //   },
+      // ],
+      posts: [],
     };
   },
   methods: {
