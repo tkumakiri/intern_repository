@@ -39,9 +39,9 @@ class AuthInfoGetView(generics.RetrieveAPIView):
             for stream in live_streams:
                 live_a["title"] = stream.title
                 live_a["started_at"] = stream.started_at
-                print(datetime.date)
+                print(datetime.datetime.now())
                 print(stream.started_at)
-                if stream.started_at < datetime.date:
+                if stream.started_at < datetime.datetime.now():
                     old_live_list.append((live_a))
                 else:
                     new_live_list.append(live_a)
