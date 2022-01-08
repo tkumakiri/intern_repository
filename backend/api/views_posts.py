@@ -47,7 +47,7 @@ def queryset_filter_is_allowed(user):
         ]
     )
 
-    return is_following | is_registering
+    return Q(author=user) | is_following | is_registering
 
 
 def basic_queryset_post(user):
