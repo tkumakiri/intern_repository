@@ -145,24 +145,32 @@ class PostsView(APIView):
     def post(self, request):
         try:
             screenshots = request.data["screenshots"]
-            del request.data["screenshots"]
-
-            serializer = PostSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            post = serializer.save()
-            result = serializer.data
-
-            # save screenshots
-            # FIXME: performance
-            for screenshot in screenshots:
-                Live_picture(post=post, data=screenshot).save()
-
-            result["screenshots"] = screenshots
-            return Response(result, status=201)
         except KeyError as ex:
             return errors.error_response(
                 400, -1, f"{ex} not found in request"
             )
+        del request.data["screenshots"]
+
+        serializer = PostSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # チェック
+        # 自分ではないアカウントから投稿しようとしていないか？
+        # Note: この時点では author_id -> author への resolve() は行われていな
+        # い
+        if serializer.validated_data["author_id"] != self.request.user:
+            return errors.invalid_author_response()
+
+        post = serializer.save()
+        result = serializer.data
+
+        # save screenshots
+        # FIXME: performance
+        for screenshot in screenshots:
+            Live_picture(post=post, data=screenshot).save()
+
+        result["screenshots"] = screenshots
+        return Response(result, status=201)
 
 
 # 特定の投稿の情報を取得する
