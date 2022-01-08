@@ -18,10 +18,13 @@ from django.urls import path
 from django.conf.urls import include, url
 from rest_framework_jwt.views import obtain_jwt_token
 
+from apiserver.view_frontend import serve_vue
+
+
 urlpatterns = [
     path('admin', admin.site.urls),
     path('admin/', admin.site.urls),
     path('auth/login', obtain_jwt_token),
-    path('', include('api.urls')),
-
+    path('api', include('api.urls')),
+    path('index', serve_vue)
 ]
