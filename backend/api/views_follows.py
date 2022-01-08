@@ -99,8 +99,20 @@ class FollowsView(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         try:
             return super().create(request, *args, **kwargs)
+        except errors.ProcessRequestError as ex:
+            return ex.response
         except IntegrityError:
             return errors.integrity_error_response(["user", "target"])
+
+    def perform_create(self, serializer):
+        data = serializer.validated_data
+        if self.request.user != data["user_id"]:
+            raise errors.ProcessRequestError(
+                errors.invalid_follow_user_response()
+            )
+        if data["user_id"] == data["target_id"]:
+            raise errors.ProcessRequestError(errors.follow_self_response())
+        return super().perform_create(serializer)
 
 
 # 特定のフォローの情報を取得・削除する

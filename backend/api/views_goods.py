@@ -38,7 +38,6 @@ class GoodSerializer(ModelSerializer):
     def create(self, validated_data):
         resolve(validated_data, "user_id", "user")
         resolve(validated_data, "post_id", "post")
-        # TODO: いいねする権限があるか確認する
         return super().create(validated_data)
 
 
@@ -106,8 +105,18 @@ class GoodsView(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         try:
             return super().create(request, *args, **kwargs)
+        except errors.ProcessRequestError as ex:
+            return ex.response
         except IntegrityError:
             return errors.integrity_error_response(["user", "post"])
+
+    def perform_create(self, serializer):
+        data = serializer.validated_data
+        if self.request.user != data["user_id"]:
+            raise errors.ProcessRequestError(
+                errors.invalid_good_user_response()
+            )
+        return super().perform_create(serializer)
 
 
 # 特定のいいねの情報を取得・削除する
