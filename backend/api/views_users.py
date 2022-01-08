@@ -14,7 +14,7 @@ class UserSerializer(ModelSerializer):
     icon = CharField(source="data")
     class Meta:
         model = User
-        fields = ["id", "username", "email", "profile", "data"]
+        fields = ["id", "username", "email", "profile", "icon"]
 
 
 # ユーザー情報取得
@@ -50,8 +50,7 @@ class UserRetrieve(generics.RetrieveAPIView):
             'username': user.username,
             'email': user.email,
             'profile': user.profile,
-            # 'image_name': user.image_name,
-            'data': user.data,
+            'icon': user.data,
             'old_live_list': old_live_list,
             'new_live_list': new_live_list
             },
