@@ -1,6 +1,7 @@
 import logging
 
 from django.db.models.query import Prefetch
+from django.db.utils import IntegrityError
 from django.http.response import Http404
 from rest_framework import generics
 from rest_framework.generics import RetrieveDestroyAPIView
@@ -74,6 +75,12 @@ class FollowsView(generics.ListCreateAPIView):
             queryset = queryset.filter(follow=target)
 
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        try:
+            return super().list(request, *args, **kwargs)
+        except IntegrityError:
+            return errors.integrity_error_response(["user", "target"])
 
 
 # 特定のフォローの情報を取得・削除する

@@ -49,6 +49,14 @@ def validation_error_response(details):
     return res
 
 
+def integrity_error_response(unique_params=[]):
+    return error_response(
+        status.HTTP_409_CONFLICT,
+        -1,
+        f"specified tuple of {', '.join(unique_params)} is already registered",
+    )
+
+
 def not_authenticated_response():
     return error_response(
         status.HTTP_401_UNAUTHORIZED, 1001, "no active user"

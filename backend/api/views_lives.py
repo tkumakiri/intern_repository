@@ -133,6 +133,7 @@ class LiveRegistrationView(ListCreateAPIView):
         print(serializer.validated_data)
 
         # 自分ではないユーザー ID から登録していないことを確認
+        # Note: この時点では *_id -> * への resolve() は行われていないのに注意
         if serializer.validated_data["user_id"] != self.request.user:
             raise errors.ProcessRequestError(errors.invalid_user_response())
 
@@ -147,5 +148,7 @@ class LiveRegistrationView(ListCreateAPIView):
             return errors.not_authenticated_response()
         except errors.ProcessRequestError as ex:
             return ex.response
+        except IntegrityError:
+            return errors.integrity_error_response(["user", "live"])
 
     # TODO: error 1001, 3001, 3002

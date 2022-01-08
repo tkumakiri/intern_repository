@@ -1,6 +1,7 @@
 import logging
 
 from django.db.models.query import Prefetch
+from django.db.utils import IntegrityError
 from django.http.response import Http404
 from rest_framework import generics
 from rest_framework.generics import RetrieveDestroyAPIView
@@ -83,6 +84,12 @@ class GoodsView(generics.ListCreateAPIView):
             queryset = queryset.filter(post=post)
 
         return queryset
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except IntegrityError:
+            return errors.integrity_error_response(["user", "post"])
 
 
 # 特定のいいねの情報を取得・削除する
