@@ -1,49 +1,22 @@
 import logging
 
-from django.contrib.auth import authenticate
-from django.db.models.aggregates import Count
 from django.db.models.query import Prefetch
 from django.db.utils import IntegrityError
 from django.http.response import Http404
-from rest_framework import (
-    authentication,
-    filters,
-    generics,
-    permissions,
-    status,
-    viewsets,
-)
-from rest_framework.fields import (
-    CharField,
-    IntegerField,
-    SerializerMethodField,
-    empty,
-)
-from rest_framework.generics import (
-    ListAPIView,
-    ListCreateAPIView,
-    RetrieveAPIView,
-    RetrieveDestroyAPIView,
-)
-from rest_framework.permissions import (
-    AllowAny,
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
-)
+from rest_framework import generics
+from rest_framework.generics import RetrieveDestroyAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.relations import PrimaryKeyRelatedField
-from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 
-from api import errors, views_lives, views_posts
-from api.models import Dm, Good, Live_register, Live_stream, Post, User
-
-from .serializer import AccountSerializer
+from api import errors, views_posts, views_users
+from api.models import Good, Post, User
 
 LOGGER = logging.getLogger("django")
 
 
 class GoodSerializer(ModelSerializer):
-    user = views_lives.UserSerializer(read_only=True)
+    user = views_users.UserSerializer(read_only=True)
     user_id = PrimaryKeyRelatedField(
         queryset=User.objects.all(), write_only=True
     )
@@ -112,6 +85,12 @@ class GoodsView(generics.ListCreateAPIView):
 
         return queryset
 
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except IntegrityError:
+            return errors.integrity_error_response(["user", "post"])
+
 
 # 特定のいいねの情報を取得・削除する
 class GoodView(RetrieveDestroyAPIView):
@@ -129,3 +108,19 @@ class GoodView(RetrieveDestroyAPIView):
             return super().retrieve(request, *args, **kwargs)
         except Http404:
             return errors.not_found_response(f"good of id {kwargs['pk']}")
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            res = super().destroy(request, *args, **kwargs)
+            res.data = {}
+            return res
+        except errors.ProcessRequestError as ex:
+            return ex.response
+
+    def perform_destroy(self, instance):
+        if instance.user != self.request.user:
+            raise errors.ProcessRequestError(
+                errors.delete_others_good_response()
+            )
+
+        return super().perform_destroy(instance)

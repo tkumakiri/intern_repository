@@ -3,6 +3,9 @@ info:
   title: わくわくボカロプラットフォーム
   description: わくわくボカロプラットフォームのバックエンド API 。
   version: 0.1.0
+servers:
+  - url: http://localhost:8000
+  - url: http://example.com:8000
 tags:
   - name: auth
     description: ログイン/ログアウトを管轄する API 群。
@@ -900,8 +903,6 @@ paths:
                   error:
                     type: string
                     example: good not found
-servers:
-  - url: https://localhost/v1
 components:
   securitySchemes:
     bearer:
