@@ -45,9 +45,8 @@
             prepend-icon="mdi-camera"
             label="アイコン画像を選択"
           />
-          <p>{{ message }}</p>
           <v-card-actions class="justify-center">
-            <v-btn class="primary" @click="submit; upload">登録</v-btn>
+            <v-btn class="primary" to="/home" @click="submit">登録</v-btn>
           </v-card-actions>
         </v-form>
       </v-card-text>
@@ -55,6 +54,7 @@
   </v-app>
 </template>
 <script>
+import axios from 'axios';
 
 export default {
   name: 'App',
@@ -68,6 +68,8 @@ export default {
       username: '',
       profile: '',
       avatar: '',
+      // error: '',
+      // message: '',
       rules_email: [
         v => !!v || '',
         v => /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]{1,}\.[A-Za-z0-9]{1,}$/.test(v) || ''
@@ -81,7 +83,7 @@ export default {
         v => !!v || ''
       ],
       rules_profile: [
-        v => (!!v &&  max >= v.length) || `${max}文字以下で入力してください`
+        v => (!!v &&  max <= v.length) || `${max}文字以下で入力してください`
       ],
       rules_icon: [
         v => !v || v.size < 2000000 || '画像サイズの上限は2MBです',
@@ -90,8 +92,13 @@ export default {
   },
   methods: {
     submit(){
-        //console.log(this.email, this.password, this.username, this.profile);
+      axios
+        .post('/users', {email: 'this.email', password: 'this.password', username: 'this.username', profile: 'this.profile'})
+        .then((res) => {
+            console.log(res.data)
+        });
     },
+        //console.log(this.email, this.password, this.username, this.profile);
   },
 };
 </script>

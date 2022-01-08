@@ -26,7 +26,6 @@
         </v-form>
       </v-card-text>
     </v-card>
-    <router-link to="/livedetail">Go to SNS</router-link>
   </v-app>
 </template>
 
@@ -57,4 +56,3 @@ export default {
   },
 };
 </script>
-

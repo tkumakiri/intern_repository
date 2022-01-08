@@ -1,21 +1,15 @@
-from functools import reduce
-
 from django.db.models.query import Prefetch
 from django.db.models.query_utils import Q
 from django.http.response import Http404
 from rest_framework.fields import CharField
 from rest_framework.generics import RetrieveAPIView
-from rest_framework.permissions import (
-    AllowAny,
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
-)
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework.views import APIView
 
-from api import errors, views_lives
+from api import errors, views_lives, views_users
 from api.models import (
     Follow,
     Live_picture,
@@ -75,7 +69,7 @@ class ScreenshotSerializer(Serializer):
 class PostSerializer(ModelSerializer):
     screenshots = ScreenshotSerializer(many=True, read_only=True)
 
-    author = views_lives.UserSerializer(read_only=True)
+    author = views_users.UserSerializer(read_only=True)
     live = views_lives.LiveSerializer(read_only=True)
     # FIXME: 自己参照なので参照を解かないことにする
     reply_target = None
@@ -151,24 +145,32 @@ class PostsView(APIView):
     def post(self, request):
         try:
             screenshots = request.data["screenshots"]
-            del request.data["screenshots"]
-
-            serializer = PostSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            post = serializer.save()
-            result = serializer.data
-
-            # save screenshots
-            # FIXME: performance
-            for screenshot in screenshots:
-                Live_picture(post=post, data=screenshot).save()
-
-            result["screenshots"] = screenshots
-            return Response(result, status=201)
         except KeyError as ex:
             return errors.error_response(
                 400, -1, f"{ex} not found in request"
             )
+        del request.data["screenshots"]
+
+        serializer = PostSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # チェック
+        # 自分ではないアカウントから投稿しようとしていないか？
+        # Note: この時点では author_id -> author への resolve() は行われていな
+        # い
+        if serializer.validated_data["author_id"] != self.request.user:
+            return errors.invalid_author_response()
+
+        post = serializer.save()
+        result = serializer.data
+
+        # save screenshots
+        # FIXME: performance
+        for screenshot in screenshots:
+            Live_picture(post=post, data=screenshot).save()
+
+        result["screenshots"] = screenshots
+        return Response(result, status=201)
 
 
 # 特定の投稿の情報を取得する

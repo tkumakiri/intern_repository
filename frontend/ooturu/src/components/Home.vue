@@ -27,22 +27,12 @@ export default {
     data() {
         return{
             lives: [
-                {
-                    date: '2021-1-6',
-                    title: 'XXXXライブ',
-                    detail: '999'
-                },
-                {
-                    date: '2021-1-7',
-                    title: '〇〇ライブ',
-                    detail: '0'
-                }
-            ]
+]
         }
     },
     mounted() {
         axios
-            .get('lives/')
+            .get('/lives')
             .then((res) => {
                 this.info = res.data;
                 console.log(res.data)

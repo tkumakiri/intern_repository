@@ -1,19 +1,19 @@
-from django.db.models.expressions import ValueRange
 from django.db.models.query import Prefetch
 from django.db.models.query_utils import Q
 from django.http.response import Http404
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
 
-from api import errors, views_lives
-from api.models import Dm, User
+from api import errors, views_users
+from api.models import Dm, Follow, User
 
 
 class DirectMessageSerializer(ModelSerializer):
-    sender = views_lives.UserSerializer(read_only=True)
-    receiver = views_lives.UserSerializer(read_only=True)
+    sender = views_users.UserSerializer(read_only=True)
+    receiver = views_users.UserSerializer(read_only=True)
     sender_id = PrimaryKeyRelatedField(
         queryset=User.objects.all(), write_only=True
     )
@@ -81,7 +81,19 @@ class DirectMessagesView(ListCreateAPIView):
             try:
                 central = User.objects.get(id=int(central))
             except ValueError:
-                return errors.parse_error_response("sender", sender)
+                raise errors.ProcessRequestError(
+                    errors.parse_error_response("central", central)
+                )
+            except User.DoesNotExist:
+                raise errors.ProcessRequestError(
+                    errors.not_found_response("central")
+                )
+
+            # チェック: central は自分である必要がある
+            if central != self.request.user:
+                raise errors.ProcessRequestError(
+                    errors.invalid_central_response()
+                )
             queryset = queryset.filter(
                 Q(sender=central) | Q(receiver=central)
             )
@@ -89,21 +101,83 @@ class DirectMessagesView(ListCreateAPIView):
         target = self.request.query_params.get("target")
         if target is not None:
             if central is None:
-                return errors.error_response(
-                    400,
-                    -1,
-                    "central must be specified when target is specified",
+                raise errors.ProcessRequestError(
+                    errors.error_response(
+                        400,
+                        -1,
+                        "central must be specified when target is specified",
+                    )
                 )
             try:
                 target = User.objects.get(id=int(target))
             except ValueError:
-                return errors.parse_error_response("target", target)
+                raise errors.ProcessRequestError(
+                    errors.parse_error_response("target", target)
+                )
+            except User.DoesNotExist:
+                raise errors.ProcessRequestError(
+                    errors.not_found_response("target")
+                )
+
+            # チェック: central と target に FF 関係が必要
+            ff = list(
+                Follow.objects.all()
+                .filter(
+                    Q(user=central, follow=target)
+                    | Q(user=target, follow=central)
+                )
+                .distinct()
+            )
+            if len(ff) == 0:
+                raise errors.ProcessRequestError(
+                    errors.central_target_no_ff_response()
+                )
+
             queryset = queryset.filter(
                 Q(receiver=central, sender=target)
                 | Q(receiver=target, sender=central)
             )
 
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        try:
+            return super().list(request, *args, **kwargs)
+        except errors.ProcessRequestError as ex:
+            return ex.response
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except ValidationError as ex:
+            # TODO: sender, receiver が存在しないときも validation error にな
+            # るが、本当は 1001, 4001 を返したい
+            return errors.validation_error_response(ex.detail)
+        except errors.ProcessRequestError as ex:
+            return ex.response
+        except Exception as ex:
+            print(repr(ex))
+            raise
+
+    def perform_create(self, serializer):
+        # 作成前にチェック
+
+        # 自分のユーザーから作成しようとしているか？
+        # Note: この時点では *_id -> * への resolve() は行われていないのに注意
+        if serializer.validated_data["sender_id"] != self.request.user:
+            raise errors.ProcessRequestError(errors.invalid_sender_response())
+
+        # 送信先のユーザーをフォローしているか？
+        receiver = serializer.validated_data["receiver_id"]
+        ff = list(
+            Follow.objects.filter(user=self.request.user, follow=receiver)
+        )
+        if len(ff) == 0:
+            raise errors.ProcessRequestError(
+                errors.receiver_not_followed_response()
+            )
+
+        return super().perform_create(serializer)
 
 
 class DirectMessageView(RetrieveAPIView):

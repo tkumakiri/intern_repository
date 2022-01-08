@@ -4,6 +4,7 @@ from django.db.models.aggregates import Count
 from django.db.models.query import Prefetch
 from django.db.utils import IntegrityError
 from django.http.response import Http404
+from rest_framework.exceptions import NotAuthenticated
 from rest_framework.fields import CharField, IntegerField
 from rest_framework.generics import (
     ListAPIView,
@@ -14,7 +15,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
 
-from api import errors
+from api import errors, views_users
 from api.models import Live_register, Live_stream, User
 
 LOGGER = logging.getLogger("django")
@@ -88,21 +89,12 @@ class LiveView(RetrieveAPIView):
         try:
             return super().retrieve(request, *args, **kwargs)
         except Http404:
-            return errors.not_found_response(f"live of id {kwargs['pk']}")
-
-
-# ユーザーの Serializer
-# TODO: 適当な場所に移動させるべし
-class UserSerializer(ModelSerializer):
-    class Meta:
-        model = User
-        # TODO: 現状モデルに icon がない
-        fields = ["id", "username", "email", "profile"]
+            return errors.not_found_response("specified live not found", 3000)
 
 
 # ライブ登録の Serializer
 class LiveRegistrationSerializer(ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = views_users.UserSerializer(read_only=True)
     live = LiveSerializer(read_only=True)
     user_id = PrimaryKeyRelatedField(
         queryset=User.objects.all(), write_only=True
@@ -136,5 +128,27 @@ class LiveRegistrationView(ListCreateAPIView):
         Prefetch("live", BASIC_QUERYSET_LIVE.all())
     )
     serializer_class = LiveRegistrationSerializer
+
+    def perform_create(self, serializer):
+        print(serializer.validated_data)
+
+        # 自分ではないユーザー ID から登録していないことを確認
+        # Note: この時点では *_id -> * への resolve() は行われていないのに注意
+        if serializer.validated_data["user_id"] != self.request.user:
+            raise errors.ProcessRequestError(errors.invalid_user_response())
+
+        # TODO: ライブのチケットが有効であることを確認
+
+        return super().perform_create(serializer)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            return super().post(request, *args, **kwargs)
+        except NotAuthenticated:
+            return errors.not_authenticated_response()
+        except errors.ProcessRequestError as ex:
+            return ex.response
+        except IntegrityError:
+            return errors.integrity_error_response(["user", "live"])
 
     # TODO: error 1001, 3001, 3002

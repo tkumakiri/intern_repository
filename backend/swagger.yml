@@ -3,6 +3,9 @@ info:
   title: わくわくボカロプラットフォーム
   description: わくわくボカロプラットフォームのバックエンド API 。
   version: 0.1.0
+servers:
+  - url: http://localhost:8000
+  - url: http://example.com:8000
 tags:
   - name: auth
     description: ログイン/ログアウトを管轄する API 群。
@@ -713,7 +716,7 @@ paths:
                     error: no active user
                 他人がしたフォローを削除しようとした:
                   value:
-                    code: 6002
+                    code: 6003
                     error: specified follow is not created by user
         "404":
           description: 解除するフォローが見つからない。
@@ -885,7 +888,7 @@ paths:
                     error: no active user
                 他人がしたいいねを削除しようとした:
                   value:
-                    code: 7002
+                    code: 7003
                     error: specified good is not created by user
         "404":
           description: 解除するいいねが見つからない。
@@ -900,8 +903,6 @@ paths:
                   error:
                     type: string
                     example: good not found
-servers:
-  - url: https://localhost/v1
 components:
   securitySchemes:
     bearer:
@@ -966,6 +967,8 @@ components:
         sent_at:
           type: string
           format: date-time
+        text:
+          type: string
     Post:
       type: object
       properties:
