@@ -107,6 +107,13 @@ def invalid_author_response():
     )
 
 
+def post_unregistered_author_response():
+    # TODO: code
+    return error_response(
+        status.HTTP_401_UNAUTHORIZED, -1, "posts to unregistered live"
+    )
+
+
 def follow_query_user_not_found():
     return error_response(
         status.HTTP_401_UNAUTHORIZED,
