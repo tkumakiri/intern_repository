@@ -967,6 +967,8 @@ components:
         sent_at:
           type: string
           format: date-time
+        text:
+          type: string
     Post:
       type: object
       properties:
