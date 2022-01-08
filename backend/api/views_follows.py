@@ -96,6 +96,12 @@ class FollowsView(generics.ListCreateAPIView):
         except IntegrityError:
             return errors.integrity_error_response(["user", "target"])
 
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except IntegrityError:
+            return errors.integrity_error_response(["user", "target"])
+
 
 # 特定のフォローの情報を取得・削除する
 class FollowView(RetrieveDestroyAPIView):
