@@ -47,7 +47,7 @@ def queryset_filter_is_allowed(user):
         ]
     )
 
-    return is_following | is_registering
+    return Q(author=user) | is_following | is_registering
 
 
 def basic_queryset_post(user):
@@ -156,10 +156,16 @@ class PostsView(APIView):
 
         # チェック
         # 自分ではないアカウントから投稿しようとしていないか？
-        # Note: この時点では author_id -> author への resolve() は行われていな
-        # い
+        # Note: この時点では *_id -> * への resolve() は行われていない
         if serializer.validated_data["author_id"] != self.request.user:
             return errors.invalid_author_response()
+
+        # 参加登録していないライブに投稿しようとしていないか？
+        live = serializer.validated_data["live_id"]
+        try:
+            Live_register.objects.get(user=self.request.user, live=live)
+        except Live_register.DoesNotExist:
+            return errors.post_unregistered_author_response()
 
         post = serializer.save()
         result = serializer.data
@@ -167,6 +173,8 @@ class PostsView(APIView):
         # save screenshots
         # FIXME: performance
         for screenshot in screenshots:
+            if len(screenshot) == 0:
+                continue
             Live_picture(post=post, data=screenshot).save()
 
         result["screenshots"] = screenshots

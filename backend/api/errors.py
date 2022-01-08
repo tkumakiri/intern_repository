@@ -107,6 +107,27 @@ def invalid_author_response():
     )
 
 
+def post_unregistered_author_response():
+    # TODO: code
+    return error_response(
+        status.HTTP_401_UNAUTHORIZED, -1, "posts to unregistered live"
+    )
+
+
+def invalid_follow_user_response():
+    # TODO: code
+    return error_response(
+        status.HTTP_401_UNAUTHORIZED, -1, "invalid user specified"
+    )
+
+
+def follow_self_response():
+    # TODO: code
+    return error_response(
+        status.HTTP_400_BAD_REQUEST, -1, "cannot follow yourself"
+    )
+
+
 def follow_query_user_not_found():
     return error_response(
         status.HTTP_401_UNAUTHORIZED,
@@ -120,6 +141,13 @@ def delete_others_follow_response():
         status.HTTP_401_UNAUTHORIZED,
         6003,
         "specified follow is not created by user",
+    )
+
+
+def invalid_good_user_response():
+    # TODO: code
+    return error_response(
+        status.HTTP_401_UNAUTHORIZED, -1, "invalid user specified"
     )
 
 

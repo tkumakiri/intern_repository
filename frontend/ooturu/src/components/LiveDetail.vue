@@ -4,7 +4,7 @@
       <v-card width="1000" height="auto">
         <v-list>
           <v-list-item>
-            <h1>00月00日開催 ライブ</h1>
+            <h1>{{ livedata.title }}</h1>
             <v-list-item-icon>
               <v-btn fab dark color="indigo" @click="onClickTweet">
                 <v-icon dark> mdi-plus </v-icon>
@@ -14,36 +14,24 @@
         </v-list>
         <v-row justify="center">
           <!-- v-forで行う -->
-          <v-card width="800" class="mb-2">
-            <v-list>
-              <v-list-item>
-                <v-list-item-avatar @click="onClickUser">
-                  <v-img src="../assets/testuser.png" max-width="100" />
-                </v-list-item-avatar>
-                <v-list-item-content>
-                  <v-list-item-title class="text-h6"
-                    >ユーザー１</v-list-item-title
-                  >
-                  <div>まぢぱない</div>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
-          </v-card>
-
-          <v-card width="800">
+          <v-card v-for="post in posts" :key="post.id" width="800">
             <v-list>
               <v-list-item>
                 <v-list-item-avatar>
-                  <v-img src="../assets/testuser.png" max-width="100" />
+                  <v-img
+                    src="../assets/testuser.png"
+                    max-width="100"
+                    @click="onClickUser"
+                  />
                 </v-list-item-avatar>
                 <v-list-item-content>
-                  <v-list-item-title class="text-h6"
-                    >ユーザー１</v-list-item-title
-                  >
+                  <v-list-item-title class="text-h6">{{
+                    post.author.username
+                  }}</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
               <v-list-item>
-                <div>まぢぱない</div>
+                <div>{{ post.text }}</div>
               </v-list-item>
               <v-list-item>
                 <v-img src="../assets/testphoto.jpeg"></v-img>
@@ -66,6 +54,86 @@
 <script>
 export default {
   name: "LiveDetail",
+  data() {
+    return {
+      livedata: {
+        id: 0,
+        title: "00月00日開催 ライブ",
+        started_at: "2022-01-07T23:07:16.931Z",
+        live_url: "string",
+        ticket_url: "string",
+        registerers: 0,
+      },
+      posts: [
+        {
+          id: 0,
+          author: {
+            id: 0,
+            email: "string",
+            username: "ユーザー1",
+            profile: "string",
+            icon: "string",
+          },
+          reply_target: "string",
+          live: {
+            id: 0,
+            title: "string",
+            started_at: "2022-01-07T23:10:43.848Z",
+            live_url: "string",
+            ticket_url: "string",
+            registerers: 0,
+          },
+          text: "最高のライブだった！特に〇〇とかライブ編曲神",
+          screenshots: ["string"],
+          posted_at: "2022-01-07T23:10:43.848Z",
+        },
+        {
+          id: 0,
+          author: {
+            id: 0,
+            email: "string",
+            username: "ユーザー２",
+            profile: "string",
+            icon: "string",
+          },
+          reply_target: "string",
+          live: {
+            id: 0,
+            title: "string",
+            started_at: "2022-01-07T23:10:43.848Z",
+            live_url: "string",
+            ticket_url: "string",
+            registerers: 0,
+          },
+          text: "今回のライブ〇〇さん好きな人は激アツだろうな〜",
+          screenshots: ["string"],
+          posted_at: "2022-01-07T23:10:43.848Z",
+        },
+        {
+          id: 0,
+          author: {
+            id: 0,
+            email: "string",
+            username: "ユーザー3",
+            profile: "string",
+            icon: "string",
+          },
+          reply_target: "string",
+          live: {
+            id: 0,
+            title: "string",
+            started_at: "2022-01-07T23:10:43.848Z",
+            live_url: "string",
+            ticket_url: "string",
+            registerers: 0,
+          },
+          text: "最高だった！",
+          screenshots: ["string"],
+          posted_at: "2022-01-07T23:10:43.848Z",
+        },
+      ],
+    };
+  },
   methods: {
     onClickUser: function () {
       this.$router.push("/userprofile");
