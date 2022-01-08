@@ -29,10 +29,10 @@ class UserManager(BaseUserManager):
             profile=profile
         )
 
-        if request_data.get('image_name'):
-            if request_data.get('data'):
-                user.image_name = request_data['image_name']
-                user.data = request_data['data']
+    # if request_data.get('image_name'):
+        if request_data.get('data'):
+            # user.image_name = request_data['image_name']
+            user.data = request_data['data']
 
         user.set_password(request_data['password'])
         user.save(using=self._db)
