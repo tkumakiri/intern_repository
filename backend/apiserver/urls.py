@@ -23,7 +23,7 @@ from apiserver.view_frontend import serve_vue
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('auth/login', obtain_jwt_token),
+    path('api/auth/login', obtain_jwt_token),
     path('api/', include('api.urls')),
     path('', serve_vue)
 ]
