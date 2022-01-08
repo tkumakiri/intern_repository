@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
     name: 'App',
     data() {
@@ -43,6 +44,25 @@ export default {
                     text: 'test2ですーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー'
                 }
             ]
+        }
+    },
+    mounted() {
+        this.getMyId()
+        axios
+            .get('http://vocalotomo.herokuapp.com/directmessages')
+            .then((res) => {
+                this.info = res.data;
+                console.log(res.data)
+            });
+    },
+    methods: {
+        getMyId(){
+            axios
+                .get('http://vocalotomo.herokuapp.com/auth/me')
+                .then((res) => {
+                    this.loginUser = res.data.id;
+                    console.log(res.data.id)
+                });
         }
     }
 };

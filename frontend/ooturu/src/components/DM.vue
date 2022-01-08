@@ -94,7 +94,27 @@ export default {
   },
 
   methods: {
-    onClickTweet: function () {},
+    onClickTweet: function () {
+      this.messeages.push({
+        id: 0,
+        sender: {
+          id: this.$store.getters.id,
+          email: this.$store.getters.email,
+          username: this.$store.getters.username,
+          profile: this.$store.getters.profile,
+          icon: this.$store.getters.icon,
+        },
+        receiver: {
+          id: 0,
+          email: "string",
+          username: "string",
+          profile: "string",
+          icon: "string",
+        },
+        sent_at: "2022-01-08T01:09:48.250Z",
+        text: this.inputText,
+      });
+    },
   },
 };
 </script>

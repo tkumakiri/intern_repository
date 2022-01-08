@@ -9,7 +9,7 @@
           class="mx-auto"
         >
           <template v-slot:append>
-            <v-btn color="primary" width="80px" class="mr-4">検索</v-btn>
+            <v-btn color="primary" width="80px" class="mr-4" @click="search">検索</v-btn>
           </template>
         </v-text-field>
       </v-form>
@@ -37,24 +37,33 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-  name: "App",
-  data() {
-    return {
-      lives: [
-        {
-          date: "2021-1-6",
-          title: "XXXXライブ",
-          detail: "999",
-        },
-        {
-          date: "2021-1-7",
-          title: "〇〇ライブ",
-          detail: "0",
-        },
-      ],
-      title: "",
-    };
-  },
+    name: 'App',
+    data() {
+        return{
+            title: '',
+            lives: []
+        }
+    },
+    mounted: function(){
+        axios
+            .get('/lives')
+            .then((res) => {
+                this.lives = res.data;
+                console.log(res.data)
+            })
+    },
+    methods: {
+        search(){
+            axios
+                .get('/lives', {live_id: this.title})
+                .then((res) => {
+                    this.lives = res.data;
+                    console.log(res.data)
+                })
+        }
+    }
 };
 </script>

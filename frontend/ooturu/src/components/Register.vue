@@ -35,6 +35,16 @@
             v-model="profile"
             :rules="rules_profile"
           />
+          <!-- <v-img
+            :src="avatar"
+            class="image"
+          /> -->
+          <v-file-input
+            :rules="rules_icon"
+            accept="image/png, image/jpeg"
+            prepend-icon="mdi-camera"
+            label="アイコン画像を選択"
+          />
           <v-card-actions class="justify-center">
             <v-btn class="primary" to="/home" @click="submit">登録</v-btn>
           </v-card-actions>
@@ -44,6 +54,7 @@
   </v-app>
 </template>
 <script>
+import axios from 'axios';
 
 export default {
   name: 'App',
@@ -56,6 +67,9 @@ export default {
       password: '',
       username: '',
       profile: '',
+      avatar: '',
+      // error: '',
+      // message: '',
       rules_email: [
         v => !!v || '',
         v => /^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]{1,}\.[A-Za-z0-9]{1,}$/.test(v) || ''
@@ -66,17 +80,25 @@ export default {
         v => /^(?=.*?[a-z])(?=.*?\d)[a-z\d]{8,100}$/i.test(v) || '半角英数字をそれぞれ1文字以上含めてください'
       ],
       rules_username: [
-          v => !!v || ''
+        v => !!v || ''
       ],
       rules_profile: [
-          v => (!!v &&  max >= v.length) || `${max}文字以下で入力してください`
-      ]
+        v => (!!v &&  max <= v.length) || `${max}文字以下で入力してください`
+      ],
+      rules_icon: [
+        v => !v || v.size < 2000000 || '画像サイズの上限は2MBです',
+      ],
     }
   },
   methods: {
     submit(){
+      axios
+        .post('/users', {email: 'this.email', password: 'this.password', username: 'this.username', profile: 'this.profile'})
+        .then((res) => {
+            console.log(res.data)
+        });
+    },
         //console.log(this.email, this.password, this.username, this.profile);
-    }
   },
 };
 </script>

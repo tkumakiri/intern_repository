@@ -8,4 +8,8 @@ module.exports = {
   indexPath: "api/templates/index.html",
   //outputDir起点でstaticファイルを格納する場所を指定
   assetsDir: "static",
+  transpileDependencies: ["vuetify"],
+  devServer: {
+    proxy: "http://vocalotomo.herokuapp.com",
+  },
 };
