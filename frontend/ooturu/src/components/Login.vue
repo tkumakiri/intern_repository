@@ -30,6 +30,8 @@
 </template>
 
 <script>
+// import axios from 'axios';
+
 export default {
   name: "App",
   data() {
@@ -37,6 +39,7 @@ export default {
       showPassword: false,
       email: "",
       password: "",
+      
       rules: [
         (v) => !!v || "",
         (v) =>
