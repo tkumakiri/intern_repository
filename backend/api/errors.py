@@ -107,6 +107,14 @@ def delete_others_follow_response():
     )
 
 
+def delete_others_good_response():
+    return error_response(
+        status.HTTP_401_UNAUTHORIZED,
+        7002,
+        "specified good is not created by user",
+    )
+
+
 class ProcessRequestError(Exception):
     def __init__(self, response):
         super().__init__(f"custom error: {response}")
