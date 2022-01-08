@@ -156,7 +156,7 @@ class Dm(models.Model):
         on_delete=models.CASCADE
     )
 
-    sent_at = models.DateField(
+    sent_at = models.DateTimeField(
         verbose_name='書き込み時刻',
         default=timezone.now,
         blank=False,
@@ -178,7 +178,7 @@ class Live_stream(models.Model):
         null=False
     )
 
-    started_at = models.DateField(
+    started_at = models.DateTimeField(
         verbose_name='日時',
         default=timezone.now,
         blank=False,
@@ -248,7 +248,7 @@ class Post(models.Model):
         on_delete=models.CASCADE
     )
 
-    posted_at = models.DateField(
+    posted_at = models.DateTimeField(
         default=timezone.now,
         blank=False,
         null=False
